@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EHealthApp.LoginPage"
+             Title="Login">
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <!-- Titlu -->
+        <Label Text="Welcome to EHealthApp"
+               FontSize="24"
+               HorizontalTextAlignment="Center"
+               Margin="0,20,0,0" />
+
+        <!-- Username -->
+        <Entry x:Name="UsernameEntry"
+               Placeholder="Username"
+               Keyboard="Text" />
+
+        <!-- Password -->
+        <Entry x:Name="PasswordEntry"
+               Placeholder="Password"
+               IsPassword="True" />
+
+        <!-- Login Button -->
+        <Button Text="Login"
+                Clicked="OnLoginButtonClicked"
+                BackgroundColor="#007AFF"
+                TextColor="White" />
+
+        <!-- Mesaj de eroare -->
+        <Label x:Name="ErrorMessageLabel"
+               TextColor="Red"
+               IsVisible="False" />
+    </VerticalStackLayout>
+</ContentPage>
