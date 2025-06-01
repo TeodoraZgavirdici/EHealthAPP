@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using EHealthApp.Data;
+using EHealth;
+
 
 namespace EHealthApp;
 
@@ -26,8 +28,6 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-
-        
-        MainPage = new NavigationPage(new LoginPage(Database));
+        MainPage = new AppShell();
     }
 }
