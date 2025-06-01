@@ -132,7 +132,12 @@ namespace EHealthApp.Data
                             .Where(u => u.Username == username)
                             .FirstOrDefaultAsync();
         }
-
+        public Task<User> GetUserByEmailAsync(string email)
+        {
+            return _database.Table<User>()
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+        }
         public Task<int> SavePrescriptionAsync(Prescription prescription)
         {
             return SaveAsync(prescription);

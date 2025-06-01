@@ -17,5 +17,8 @@ namespace EHealthApp.Data
         public string FullName { get; set; }
 
         public DateTime DateOfBirth { get; set; }
+        public string Email { get; set; } // <--- ADĂUGĂ ACEASTĂ LINIE
+        public string Name { get; set; }
+
     }
 }

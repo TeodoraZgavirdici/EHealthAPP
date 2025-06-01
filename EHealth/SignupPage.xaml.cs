@@ -1,17 +1,22 @@
-﻿using Microsoft.Maui.Controls;
+﻿using EHealthApp.Data;
+using Microsoft.Maui.Controls;
 using System;
-using EHealthApp.Data; // Dacă ai nevoie de User și AppDatabase
+using EHealthApp.Models;
 
-namespace EHealth
+namespace EHealthApp
 {
     public partial class SignupPage : ContentPage
     {
         private readonly AppDatabase _database;
 
-        public SignupPage()
+        // Constructor fără parametri pentru Shell și DI
+        public SignupPage() : this(App.Database) { }
+
+        // Constructor cu bază de date pentru testare sau injecție explicită
+        public SignupPage(AppDatabase database)
         {
             InitializeComponent();
-            _database = App.Database; // Sau injecție prin constructor, dacă folosești DI
+            _database = database;
         }
 
         private async void OnSignupClicked(object sender, EventArgs e)
@@ -50,10 +55,10 @@ namespace EHealth
                 Password = password
             };
 
-            await _database.AddUserAsync(user);
+            await _database.SaveUserAsync(user);
 
             await DisplayAlert("Succes", "Cont creat cu succes!", "OK");
-            await Navigation.PopAsync();
+            await Shell.Current.GoToAsync("..");
         }
     }
 }
