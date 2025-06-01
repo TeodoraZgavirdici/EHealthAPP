@@ -1,16 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="EHealthApp.SignupPage"
-             Title="Înregistrare">
-	<VerticalStackLayout Padding="30" Spacing="15">
-		<Label Text="Creare cont nou" FontSize="24" HorizontalOptions="Center"/>
-		<Entry x:Name="UsernameEntry" Placeholder="Username" />
-
-		<Entry x:Name="NameEntry" Placeholder="Nume complet"/>
-		<Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email"/>
-		<Entry x:Name="PasswordEntry" Placeholder="Parolă" IsPassword="True"/>
-		<Button Text="Înregistrează-te" Clicked="OnSignupClicked"/>
-		<Label x:Name="MessageLabel" TextColor="Red" IsVisible="False"/>
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
+             x:Class="EHealthApp.AppointmentsPage"
+             Title="Programări">
+	<VerticalStackLayout Padding="16" Spacing="12">
+		<Label Text="Calendar programări" FontSize="22" HorizontalOptions="Center"/>
+		<syncfusion:SfCalendar x:Name="MedicalCalendar"
+                               View="Month"
+                               ShowTodayButton="True"
+                               SelectionChanged="MedicalCalendar_SelectionChanged"
+                               HeightRequest="350"/>
+		<HorizontalStackLayout Spacing="10">
+			<Button Text="Adaugă programare"
+                    Clicked="OnAddAppointmentClicked"
+                    HorizontalOptions="FillAndExpand"/>
+			<Button Text="Vezi toate programările"
+                    Clicked="OnViewAllAppointmentsClicked"
+                    HorizontalOptions="FillAndExpand"/>
+		</HorizontalStackLayout>
+		<Label Text="Programările zilei selectate:" FontSize="18" Margin="0,12,0,0"/>
+		<CollectionView x:Name="AppointmentsList"
+                        HeightRequest="130">
+			<CollectionView.ItemTemplate>
+				<DataTemplate>
+					<Frame Margin="4" Padding="10" BackgroundColor="#f5f5f5" CornerRadius="8">
+						<VerticalStackLayout>
+							<Label Text="{Binding Ora}" FontSize="16" TextColor="#576cbc"/>
+							<Label Text="{Binding Descriere}" FontSize="14"/>
+						</VerticalStackLayout>
+					</Frame>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+		</CollectionView>
 	</VerticalStackLayout>
 </ContentPage>

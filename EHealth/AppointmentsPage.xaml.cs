@@ -5,53 +5,75 @@ namespace EHealthApp;
 
 public partial class AppointmentsPage : ContentPage
 {
-    public ObservableCollection<AppointmentModel> Programari { get; set; } = new();
+    // NU mai declara AppointmentsList sau MedicalCalendar ca field/property aici!
+
+    // Programări grupate pe zi
+    private readonly Dictionary<DateTime, ObservableCollection<AppointmentModel>> _programariPeZi = new();
+    // Listă temporară pentru afișare (nume diferit ca să nu fie ambiguu)
+    private readonly ObservableCollection<AppointmentModel> _programariAfisate = new();
 
     public AppointmentsPage()
     {
         InitializeComponent();
-        AppointmentsList.ItemsSource = Programari;
+        AppointmentsList.ItemsSource = _programariAfisate;
         ActualizeazaProgramari(DateTime.Today);
     }
 
     private void MedicalCalendar_SelectionChanged(object sender, CalendarSelectionChangedEventArgs e)
     {
-        // Fix: Access the NewValue property and cast it to DateTime if applicable
         if (e.NewValue is DateTime ziSelectata)
             ActualizeazaProgramari(ziSelectata);
     }
 
     private void ActualizeazaProgramari(DateTime zi)
     {
-        // Exemplu: Înlocuiește cu încărcare din baza de date locală/fișier/etc.
-        Programari.Clear();
-
-        // Exemplu static: dacă ziua e astăzi, afișează o programare
-        if (zi.Date == DateTime.Today)
+        _programariAfisate.Clear();
+        if (_programariPeZi.TryGetValue(zi.Date, out var lista))
         {
-            Programari.Add(new AppointmentModel
-            {
-                Ora = "14:00",
-                Descriere = "Consultație la medicul de familie"
-            });
+            foreach (var p in lista)
+                _programariAfisate.Add(p);
         }
     }
 
     private async void OnAddAppointmentClicked(object sender, EventArgs e)
     {
-        // Exemplu simplu de dialog pentru adăugare programare
+        if (MedicalCalendar.SelectedDate is not DateTime ziSelectata)
+        {
+            await DisplayAlert("Eroare", "Selectează o zi în calendar!", "OK");
+            return;
+        }
+
         var ora = await DisplayPromptAsync("Oră", "Introduceți ora programării (ex: 15:30)");
         var descriere = await DisplayPromptAsync("Descriere", "Descrieți scopul programării");
 
         if (!string.IsNullOrWhiteSpace(ora) && !string.IsNullOrWhiteSpace(descriere))
         {
-            Programari.Add(new AppointmentModel
+            if (!_programariPeZi.ContainsKey(ziSelectata.Date))
+                _programariPeZi[ziSelectata.Date] = new ObservableCollection<AppointmentModel>();
+
+            _programariPeZi[ziSelectata.Date].Add(new AppointmentModel
             {
                 Ora = ora,
                 Descriere = descriere
             });
+
+            ActualizeazaProgramari(ziSelectata);
             await DisplayAlert("Succes", "Programare adăugată!", "OK");
         }
+    }
+
+    private async void OnViewAllAppointmentsClicked(object sender, EventArgs e)
+    {
+        var toate = _programariPeZi
+            .OrderBy(p => p.Key)
+            .SelectMany(p => p.Value.Select(x => $"{p.Key:dd.MM.yyyy} - {x.Ora} - {x.Descriere}"))
+            .ToList();
+
+        string mesaj = toate.Any()
+            ? string.Join("\n", toate)
+            : "Nu există programări.";
+
+        await DisplayAlert("Toate programările", mesaj, "OK");
     }
 }
 
