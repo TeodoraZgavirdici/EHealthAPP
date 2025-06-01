@@ -5,16 +5,17 @@ namespace EHealthApp;
 
 public partial class AppointmentsPage : ContentPage
 {
-    // NU mai declara AppointmentsList sau MedicalCalendar ca field/property aici!
-
-    // Programări grupate pe zi
+    // Dicționar pentru programări grupate pe zi
     private readonly Dictionary<DateTime, ObservableCollection<AppointmentModel>> _programariPeZi = new();
-    // Listă temporară pentru afișare (nume diferit ca să nu fie ambiguu)
+
+    // Listă temporară pentru afișarea programărilor zilei selectate
     private readonly ObservableCollection<AppointmentModel> _programariAfisate = new();
 
     public AppointmentsPage()
     {
         InitializeComponent();
+        // NU declara AppointmentsList sau MedicalCalendar aici! Se generează automat din XAML
+
         AppointmentsList.ItemsSource = _programariAfisate;
         ActualizeazaProgramari(DateTime.Today);
     }

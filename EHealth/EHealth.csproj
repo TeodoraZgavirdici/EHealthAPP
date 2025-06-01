@@ -45,7 +45,6 @@
 	<!-- Include all your pages as <Page Include=.../> -->
 	<ItemGroup>
 		<Page Include="App.xaml" />
-		<Page Include="AppointmentsPage.xaml" />
 		<Page Include="AppShell.xaml" />
 		<Page Include="LoginPage.xaml" />
 		<Page Include="MainPage.xaml" />
@@ -54,6 +53,12 @@
 
 	<ItemGroup>
 		<Folder Include="Platforms\Android\NewFolder\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="AppointmentsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
