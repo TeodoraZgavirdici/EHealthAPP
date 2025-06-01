@@ -1,12 +1,12 @@
 ﻿using System;
 using SQLite;
-
+using EHealthApp.Data;
 namespace EHealthApp.Models
 {
     /// <summary>
     /// Reprezintă un model pentru programările gestionate în aplicație, inclusiv pentru persistare în SQLite și notificări.
     /// </summary>
-    public class Appointment
+    public class Appointment: IRecord
     {
         /// <summary>
         /// Id unic pentru fiecare programare.

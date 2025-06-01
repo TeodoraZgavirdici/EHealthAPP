@@ -8,10 +8,8 @@
         <syncfusion:SfCalendar x:Name="MedicalCalendar"
                                View="Month"
                                ShowTodayButton="True"
-                               ShowNavigationArrows="True"
                                SelectionChanged="MedicalCalendar_SelectionChanged"
                                HeightRequest="350"/>
-
         <Button Text="Adaugă programare" 
                 Clicked="OnAddAppointmentClicked" 
                 HorizontalOptions="Fill" />

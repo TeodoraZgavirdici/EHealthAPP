@@ -8,7 +8,7 @@
 
     <ShellContent
         Title="Login"
-ContentTemplate="{DataTemplate local:LoginPage}"
+        ContentTemplate="{DataTemplate local:LoginPage}"
         Route="login" />
 
     <ShellContent
@@ -20,4 +20,9 @@ ContentTemplate="{DataTemplate local:LoginPage}"
         Title="Înregistrare"
         ContentTemplate="{DataTemplate local:SignupPage}"
         Route="signup" />
+
+    <ShellContent
+        Title="Programări"
+        ContentTemplate="{DataTemplate local:AppointmentsPage}"
+        Route="appointments" />
 </Shell>

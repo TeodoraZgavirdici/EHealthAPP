@@ -14,8 +14,9 @@ public partial class AppointmentsPage : ContentPage
         ActualizeazaProgramari(DateTime.Today);
     }
 
-    private void MedicalCalendar_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void MedicalCalendar_SelectionChanged(object sender, CalendarSelectionChangedEventArgs e)
     {
+        // Fix: Access the NewValue property and cast it to DateTime if applicable
         if (e.NewValue is DateTime ziSelectata)
             ActualizeazaProgramari(ziSelectata);
     }
