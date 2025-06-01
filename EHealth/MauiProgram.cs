@@ -19,7 +19,11 @@ public static class MauiProgram
             });
 
         // ✅ Înregistrează baza de date ca serviciu singleton
-        builder.Services.AddSingleton<AppDatabase>();
+        builder.Services.AddSingleton<AppDatabase>(provider =>
+        {
+            string dbPath = Path.Combine(FileSystem.AppDataDirectory, "ehealth.db3");
+            return new AppDatabase(dbPath);
+        });
 
         return builder.Build();
     }
