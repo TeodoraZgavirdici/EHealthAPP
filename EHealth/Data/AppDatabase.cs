@@ -2,6 +2,8 @@
 using EHealthApp.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EHealthApp.Data;
+
 
 namespace EHealthApp.Data
 {
@@ -83,6 +85,26 @@ namespace EHealthApp.Data
             return DeleteAsync(appointment);
         }
 
+        /// <summary>
+        /// Găsește o programare după ID.
+        /// </summary>
+        public Task<Appointment> GetAppointmentByIdAsync(int id)
+        {
+            return _database.Table<Appointment>()
+            .Where(a => a.Id == id)
+            .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Găsește programările programate pentru o anumită zi.
+        /// </summary>
+        public Task<List<Appointment>> GetAppointmentsByDateAsync(System.DateTime date)
+        {
+            return _database.Table<Appointment>()
+            .Where(a => a.AppointmentDate.Date == date.Date)
+            .ToListAsync();
+        }
+
         // MedicalDocuments
         public Task<List<MedicalDocument>> GetMedicalDocumentsAsync()
         {
@@ -104,6 +126,12 @@ namespace EHealthApp.Data
         {
             return GetAllAsync<Prescription>();
         }
+        public Task<User> GetUserByUsernameAsync(string username)
+        {
+            return _database.Table<User>()
+                            .Where(u => u.Username == username)
+                            .FirstOrDefaultAsync();
+        }
 
         public Task<int> SavePrescriptionAsync(Prescription prescription)
         {
@@ -117,9 +145,6 @@ namespace EHealthApp.Data
     }
 
 
-    /// <summary>
-    /// Interfață comună pentru toate entitățile care necesită un ID unic.
-    /// </summary>
     public interface IRecord
     {
         int Id { get; set; }

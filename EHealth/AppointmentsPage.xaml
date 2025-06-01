@@ -1,0 +1,70 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EHealthApp.AppointmentsPage"
+             Title="Programări">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout Padding="20" Spacing="15">
+                <!-- Secțiunea de adăugare a unei programări -->
+                <Frame CornerRadius="10" BorderColor="LightGray" Padding="15">
+                    <StackLayout Spacing="10">
+                        <Label Text="Adaugă programare nouă" 
+                               FontAttributes="Bold" 
+                               FontSize="Medium"
+                               HorizontalOptions="Center" />
+
+                        <Entry x:Name="TitleEntry" 
+                               Placeholder="Introduceți numele programării" 
+                               Margin="0,5,0,0" />
+
+                        <DatePicker x:Name="DatePicker" 
+                                    Margin="0,5,0,0" />
+
+                        <Button Text="Adaugă Programare" 
+                                Clicked="OnAddAppointmentClicked" 
+                                BackgroundColor="#007AFF" 
+                                TextColor="White" 
+                                CornerRadius="5" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Secțiunea de listare a programărilor -->
+                <Frame CornerRadius="10" BorderColor="LightGray" Padding="15">
+                    <StackLayout>
+                        <Label Text="Lista programărilor" 
+                               FontAttributes="Bold" 
+                               FontSize="Medium"
+                               HorizontalOptions="Center" />
+
+                        <CollectionView x:Name="AppointmentsList" 
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame BorderColor="LightGray" CornerRadius="5" Padding="10">
+                                        <StackLayout Orientation="Horizontal" Spacing="15">
+                                            <StackLayout VerticalOptions="CenterAndExpand">
+                                                <Label Text="{Binding Name}" 
+                                                       FontAttributes="Bold" 
+                                                       FontSize="Small" />
+                                                <Label Text="{Binding AppointmentDate, StringFormat='{}{0:dd/MM/yyyy}'}" 
+                                                       FontSize="Small" />
+                                            </StackLayout>
+
+                                            <Button Text="Șterge" 
+                                                    BackgroundColor="Red" 
+                                                    TextColor="White" 
+                                                    CornerRadius="5" 
+                                                    Clicked="OnDeleteClicked" 
+                                                    CommandParameter="{Binding Id}" 
+                                                    HorizontalOptions="End" />
+                                        </StackLayout>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

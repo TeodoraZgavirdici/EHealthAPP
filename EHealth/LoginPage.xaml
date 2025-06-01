@@ -27,6 +27,12 @@
                 BackgroundColor="#007AFF"
                 TextColor="White" />
 
+        <!-- Buton Signup -->
+        <Button Text="Nu ai cont? Creează cont nou"
+                Clicked="OnSignupButtonClicked"
+                BackgroundColor="Transparent"
+                TextColor="#007AFF" />
+
         <!-- Mesaj de eroare -->
         <Label x:Name="ErrorMessageLabel"
                TextColor="Red"

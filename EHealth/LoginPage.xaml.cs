@@ -1,6 +1,10 @@
 ﻿using EHealthApp.Data; // Include AppDatabase
 using Microsoft.Maui.Controls;
 using System.Threading.Tasks;
+using EHealthApp.Data;
+using EHealthApp;
+using EHealth;
+
 
 namespace EHealthApp
 {
@@ -37,6 +41,11 @@ namespace EHealthApp
 
             // Navighează la pagina principală dacă autentificarea a reușit
             await Navigation.PushAsync(new MainPage());
+
+        }
+        private async void OnSignupButtonClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("signup");
         }
 
         private void ShowErrorMessage(string message)

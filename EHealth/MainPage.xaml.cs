@@ -1,25 +1,30 @@
-﻿namespace EHealth
+﻿using Microsoft.Maui.Controls;
+
+namespace EHealth
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
-
         public MainPage()
         {
             InitializeComponent();
         }
 
+        private void OnAddUserClicked(object sender, EventArgs e)
+        {
+            // Logica pentru adăugarea unui utilizator
+            DisplayAlert("Add User", "Add User button clicked!", "OK");
+        }
+
+        private void OnShowUsersClicked(object sender, EventArgs e)
+        {
+            // Logica pentru afișarea utilizatorilor
+            DisplayAlert("Show Users", "Show Users button clicked!", "OK");
+        }
+
         private void OnCounterClicked(object sender, EventArgs e)
         {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            // Exemplu logică pentru butonul de incrementare
+            DisplayAlert("Button Clicked", "Counter button clicked!", "OK");
         }
     }
-
 }

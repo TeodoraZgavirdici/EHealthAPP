@@ -14,9 +14,9 @@ namespace EHealthApp.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        public string MedicationName { get; set; } // Numele medicamentului
-        public string Dosage { get; set; } // Doza prescrisă
-        public string Instructions { get; set; } // Instrucțiuni de administrare
-        public DateTime DatePrescribed { get; set; } // Data rețetei
+        public string MedicationName { get; set; } 
+        public string Dosage { get; set; } 
+        public string Instructions { get; set; } 
+        public DateTime DatePrescribed { get; set; } 
     }
 }
