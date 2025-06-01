@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Maui.Controls;
 using EHealthApp;
-namespace EHealth
+namespace EHealthApp
 {
     public partial class AppShell : Shell
     {

@@ -1,14 +1,12 @@
 ﻿using System;
-using SQLite; // Pentru utilizarea atributele SQLite (e.g., [PrimaryKey], [AutoIncrement])
-using EHealthApp.Data;
-
+using SQLite;
 
 namespace EHealthApp.Models
 {
     /// <summary>
-    /// Reprezintă un model pentru programările gestionate în aplicație.
+    /// Reprezintă un model pentru programările gestionate în aplicație, inclusiv pentru persistare în SQLite și notificări.
     /// </summary>
-    public class Appointment : IRecord
+    public class Appointment
     {
         /// <summary>
         /// Id unic pentru fiecare programare.
@@ -27,7 +25,7 @@ namespace EHealthApp.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Data programării.
+        /// Data și ora programării.
         /// </summary>
         public DateTime AppointmentDate { get; set; }
     }

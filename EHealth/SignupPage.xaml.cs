@@ -21,18 +21,22 @@ namespace EHealthApp
 
         private async void OnSignupClicked(object sender, EventArgs e)
         {
+            string username = UsernameEntry.Text?.Trim(); // <-- Nou!
             string name = NameEntry.Text?.Trim();
             string email = EmailEntry.Text?.Trim();
             string password = PasswordEntry.Text;
 
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(username) ||
+                string.IsNullOrEmpty(name) ||
+                string.IsNullOrEmpty(email) ||
+                string.IsNullOrEmpty(password))
             {
                 MessageLabel.Text = "Completează toate câmpurile!";
                 MessageLabel.IsVisible = true;
                 return;
             }
 
-            var existingUser = await _database.GetUserByUsernameAsync(name);
+            var existingUser = await _database.GetUserByUsernameAsync(username); // caută după username!
             if (existingUser != null)
             {
                 MessageLabel.Text = "Username-ul este deja folosit!";
@@ -51,6 +55,7 @@ namespace EHealthApp
             var user = new User
             {
                 Name = name,
+                Username = username, // <-- Asta contează!
                 Email = email,
                 Password = password
             };

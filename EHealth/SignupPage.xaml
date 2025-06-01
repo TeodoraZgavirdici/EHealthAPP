@@ -5,6 +5,8 @@
              Title="Înregistrare">
 	<VerticalStackLayout Padding="30" Spacing="15">
 		<Label Text="Creare cont nou" FontSize="24" HorizontalOptions="Center"/>
+		<Entry x:Name="UsernameEntry" Placeholder="Username" />
+
 		<Entry x:Name="NameEntry" Placeholder="Nume complet"/>
 		<Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email"/>
 		<Entry x:Name="PasswordEntry" Placeholder="Parolă" IsPassword="True"/>

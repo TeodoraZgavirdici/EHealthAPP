@@ -1,69 +1,61 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using EHealthApp.Data;
-using EHealthApp.Models;
+﻿using Syncfusion.Maui.Calendar;
+using System.Collections.ObjectModel;
 
-namespace EHealthApp
+namespace EHealthApp;
+
+public partial class AppointmentsPage : ContentPage
 {
-    public partial class AppointmentsPage : ContentPage
+    public ObservableCollection<AppointmentModel> Programari { get; set; } = new();
+
+    public AppointmentsPage()
     {
-        private readonly AppDatabase _database;
+        InitializeComponent();
+        AppointmentsList.ItemsSource = Programari;
+        ActualizeazaProgramari(DateTime.Today);
+    }
 
-        public AppointmentsPage(AppDatabase database)
+    private void MedicalCalendar_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.NewValue is DateTime ziSelectata)
+            ActualizeazaProgramari(ziSelectata);
+    }
+
+    private void ActualizeazaProgramari(DateTime zi)
+    {
+        // Exemplu: Înlocuiește cu încărcare din baza de date locală/fișier/etc.
+        Programari.Clear();
+
+        // Exemplu static: dacă ziua e astăzi, afișează o programare
+        if (zi.Date == DateTime.Today)
         {
-            InitializeComponent();
-            _database = database;
-
-            // Actualizează lista programărilor
-            LoadAppointments();
-        }
-
-        // Încarcă programările din baza de date
-        private async void LoadAppointments()
-        {
-            var appointments = await _database.GetAppointmentsAsync();
-            AppointmentsList.ItemsSource = appointments;
-        }
-
-        // Adaugă o programare nouă
-        private async void OnAddAppointmentClicked(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(TitleEntry.Text)) // Folosim TitleEntry în loc de NameEntry
+            Programari.Add(new AppointmentModel
             {
-                await DisplayAlert("Eroare", "Introdu un titlu valid!", "OK");
-                return;
-            }
-
-            var appointment = new Appointment
-            {
-                Title = TitleEntry.Text, // Folosim Title
-                AppointmentDate = DatePicker.Date   // Modificăm proprietatea "AppointmentDate" cu "Date"
-            };
-
-            await _database.SaveAppointmentAsync(appointment);
-
-            // Resetează câmpurile
-            TitleEntry.Text = string.Empty; // Resetează TitleEntry în loc de NameEntry
-            DatePicker.Date = DateTime.Now;
-
-            // Reîncarcă lista
-            LoadAppointments();
-        }
-
-        // Șterge o programare
-        private async void OnDeleteClicked(object sender, EventArgs e)
-        {
-            var id = (int)((Button)sender).CommandParameter;
-            var appointment = await _database.GetAppointmentByIdAsync(id);
-
-            if (appointment != null)
-            {
-                await _database.DeleteAppointmentAsync(appointment);
-                LoadAppointments();
-            }
+                Ora = "14:00",
+                Descriere = "Consultație la medicul de familie"
+            });
         }
     }
+
+    private async void OnAddAppointmentClicked(object sender, EventArgs e)
+    {
+        // Exemplu simplu de dialog pentru adăugare programare
+        var ora = await DisplayPromptAsync("Oră", "Introduceți ora programării (ex: 15:30)");
+        var descriere = await DisplayPromptAsync("Descriere", "Descrieți scopul programării");
+
+        if (!string.IsNullOrWhiteSpace(ora) && !string.IsNullOrWhiteSpace(descriere))
+        {
+            Programari.Add(new AppointmentModel
+            {
+                Ora = ora,
+                Descriere = descriere
+            });
+            await DisplayAlert("Succes", "Programare adăugată!", "OK");
+        }
+    }
+}
+
+public class AppointmentModel
+{
+    public string Ora { get; set; }
+    public string Descriere { get; set; }
 }
