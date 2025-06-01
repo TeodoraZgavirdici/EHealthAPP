@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:EHealth"
+    xmlns:login="clr-namespace:EHealthApp"
     Shell.FlyoutBehavior="Flyout"
     Title="EHealth">
 
     <ShellContent
         Title="Login"
-        ContentTemplate="{DataTemplate local:LoginPage}"
+        ContentTemplate="{DataTemplate login:LoginPage}"
         Route="login" />
 
     <ShellContent
@@ -20,5 +21,4 @@
         Title="Înregistrare"
         ContentTemplate="{DataTemplate local:SignupPage}"
         Route="signup" />
-
 </Shell>

@@ -1,10 +1,6 @@
-﻿using EHealthApp.Data; // Include AppDatabase
-using Microsoft.Maui.Controls;
-using System.Threading.Tasks;
+﻿
 using EHealthApp.Data;
-using EHealthApp;
-using EHealth;
-
+using Microsoft.Maui.Controls;
 
 namespace EHealthApp
 {
@@ -12,26 +8,26 @@ namespace EHealthApp
     {
         private readonly AppDatabase _database;
 
+        // Constructor fără parametri pentru Shell
+        public LoginPage() : this(App.Database) { }
+
         public LoginPage(AppDatabase database)
         {
             InitializeComponent();
-            _database = database; // Inițializează baza de date
+            _database = database;
         }
 
         private async void OnLoginButtonClicked(object sender, EventArgs e)
         {
-            // Preia input-ul utilizatorului
             string username = UsernameEntry.Text;
             string password = PasswordEntry.Text;
 
-            // Validare input
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
                 ShowErrorMessage("Username and password are required.");
                 return;
             }
 
-            // Caută utilizatorul în baza de date
             var user = await _database.GetUserByUsernameAsync(username);
             if (user == null || user.Password != password)
             {
@@ -39,10 +35,10 @@ namespace EHealthApp
                 return;
             }
 
-            // Navighează la pagina principală dacă autentificarea a reușit
-            await Navigation.PushAsync(new MainPage());
-
+            // Navighează la Home (MainPage) și resetează stiva de navigare
+            await Shell.Current.GoToAsync("//MainPage");
         }
+
         private async void OnSignupButtonClicked(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync("signup");
@@ -50,7 +46,6 @@ namespace EHealthApp
 
         private void ShowErrorMessage(string message)
         {
-            // Afișează mesajul de eroare
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.IsVisible = true;
         }
