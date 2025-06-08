@@ -1,4 +1,5 @@
 ﻿using EHealthApp.Data;
+using EHealthApp.Models;
 
 namespace EHealthApp
 {
@@ -18,12 +19,14 @@ namespace EHealthApp
 
         private async void OnSignupClicked(object sender, EventArgs e)
         {
+            string username = UsernameEntry.Text?.Trim(); // <-- adăugat
             string email = EmailEntry.Text?.Trim();
             string password = PasswordEntry.Text;
             string confirmPassword = ConfirmPasswordEntry.Text;
 
-            // Exemplu: verificăm să fie completate toate câmpurile
-            if (string.IsNullOrEmpty(email) ||
+            // Verificăm să fie completate toate câmpurile
+            if (string.IsNullOrEmpty(username) ||
+                string.IsNullOrEmpty(email) ||
                 string.IsNullOrEmpty(password) ||
                 string.IsNullOrEmpty(confirmPassword))
             {
@@ -44,8 +47,17 @@ namespace EHealthApp
                 return;
             }
 
+            // Verifică unicitatea username-ului (opțional, dar recomandat)
+            var existingUser = await _database.GetUserByUsernameAsync(username);
+            if (existingUser != null)
+            {
+                await DisplayAlert("Eroare", "Username-ul este deja folosit!", "OK");
+                return;
+            }
+
             var user = new User
             {
+                Username = username, // <-- adăugat
                 Email = email,
                 Password = password
             };

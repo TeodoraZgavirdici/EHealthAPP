@@ -6,6 +6,9 @@
     <VerticalStackLayout Padding="16" Spacing="12">
         <Label Text="Creează cont nou" FontSize="22" HorizontalOptions="Center"/>
 
+        <!-- Adaugă câmpul pentru Username -->
+        <Entry x:Name="UsernameEntry" Placeholder="Username" Keyboard="Default"/>
+
         <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email"/>
         <Entry x:Name="PasswordEntry" Placeholder="Parolă" IsPassword="True"/>
         <Entry x:Name="ConfirmPasswordEntry" Placeholder="Confirmă parola" IsPassword="True"/>
