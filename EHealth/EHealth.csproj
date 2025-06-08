@@ -38,6 +38,8 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.20" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="PdfSharpCore" Version="1.3.67" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.9" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="Syncfusion.Maui.Calendar" Version="28.4.54" />
 	</ItemGroup>
@@ -53,6 +55,12 @@
 
 	<ItemGroup>
 		<Folder Include="Platforms\Android\NewFolder\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="MedicalDocumentsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

@@ -1,0 +1,31 @@
+﻿<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    x:Class="EHealthApp.MedicalDocumentsPage"
+    Title="Documente medicale">
+
+    <VerticalStackLayout Spacing="20" Padding="20">
+        <Button Text="Adaugă document medical" Clicked="OnAddMedicalDocumentClicked"/>
+        <Label Text="Documentele tale:" FontAttributes="Bold"/>
+        <CollectionView x:Name="DocumentsCollectionView" IsGrouped="True">
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding Category}" FontAttributes="Bold" FontSize="Medium"/>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Text="{Binding FileName}" VerticalOptions="Center"/>
+                        <Button Grid.Column="1" Text="Share" Clicked="OnShareClicked" CommandParameter="{Binding FilePath}"/>
+                        <Button Grid.Column="2" Text="Descarcă" Clicked="OnDownloadClicked" CommandParameter="{Binding FilePath}"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>
