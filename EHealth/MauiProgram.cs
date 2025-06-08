@@ -1,4 +1,5 @@
 ﻿using EHealthApp.Data; // Namespace-ul tău pentru AppDatabase
+using Syncfusion.Maui.Core.Hosting; // Adaugă acest using!
 
 namespace EHealthApp;
 
@@ -10,6 +11,7 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
+            .ConfigureSyncfusionCore() // << ADĂUGAT pentru controalele Syncfusion!
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

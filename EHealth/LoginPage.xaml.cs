@@ -1,5 +1,5 @@
-﻿
-using EHealthApp.Data;
+﻿using EHealthApp.Data;
+using Microsoft.Maui.Storage; // Adaugă acest using pentru Preferences
 
 namespace EHealthApp
 {
@@ -33,6 +33,9 @@ namespace EHealthApp
                 ShowErrorMessage("Invalid username or password.");
                 return;
             }
+
+            // Salvează userul logat în Preferences (persistent login)
+            Preferences.Set("logged_user", user.Username);
 
             // Navighează la Home (MainPage) și resetează stiva de navigare
             await Shell.Current.GoToAsync("//MainPage");

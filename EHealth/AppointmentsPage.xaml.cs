@@ -1,39 +1,35 @@
-﻿using Syncfusion.Maui.Calendar;
+﻿using EHealthApp.Data;
+using EHealthApp.Models;
+using Syncfusion.Maui.Calendar;
 using System.Collections.ObjectModel;
 
 namespace EHealthApp;
 
 public partial class AppointmentsPage : ContentPage
 {
-    // Dicționar pentru programări grupate pe zi
-    private readonly Dictionary<DateTime, ObservableCollection<AppointmentModel>> _programariPeZi = new();
-
-    // Listă temporară pentru afișarea programărilor zilei selectate
-    private readonly ObservableCollection<AppointmentModel> _programariAfisate = new();
+    private readonly AppDatabase _database;
+    private readonly ObservableCollection<Appointment> _programariAfisate = new();
 
     public AppointmentsPage()
     {
         InitializeComponent();
-        // NU declara AppointmentsList sau MedicalCalendar aici! Se generează automat din XAML
-
+        _database = App.Database; // asigură-te că ai o proprietate statică App.Database
         AppointmentsList.ItemsSource = _programariAfisate;
-        ActualizeazaProgramari(DateTime.Today);
+        LoadAppointments(DateTime.Today);
     }
 
     private void MedicalCalendar_SelectionChanged(object sender, CalendarSelectionChangedEventArgs e)
     {
         if (e.NewValue is DateTime ziSelectata)
-            ActualizeazaProgramari(ziSelectata);
+            LoadAppointments(ziSelectata);
     }
 
-    private void ActualizeazaProgramari(DateTime zi)
+    private async void LoadAppointments(DateTime zi)
     {
         _programariAfisate.Clear();
-        if (_programariPeZi.TryGetValue(zi.Date, out var lista))
-        {
-            foreach (var p in lista)
-                _programariAfisate.Add(p);
-        }
+        var lista = await _database.GetAppointmentsByDateAsync(zi);
+        foreach (var p in lista)
+            _programariAfisate.Add(p);
     }
 
     private async void OnAddAppointmentClicked(object sender, EventArgs e)
@@ -45,41 +41,42 @@ public partial class AppointmentsPage : ContentPage
         }
 
         var ora = await DisplayPromptAsync("Oră", "Introduceți ora programării (ex: 15:30)");
+        var titlu = await DisplayPromptAsync("Titlu", "Introduceți titlul programării");
         var descriere = await DisplayPromptAsync("Descriere", "Descrieți scopul programării");
 
-        if (!string.IsNullOrWhiteSpace(ora) && !string.IsNullOrWhiteSpace(descriere))
+        if (!string.IsNullOrWhiteSpace(ora) && !string.IsNullOrWhiteSpace(titlu) && !string.IsNullOrWhiteSpace(descriere))
         {
-            if (!_programariPeZi.ContainsKey(ziSelectata.Date))
-                _programariPeZi[ziSelectata.Date] = new ObservableCollection<AppointmentModel>();
-
-            _programariPeZi[ziSelectata.Date].Add(new AppointmentModel
+            if (!TimeSpan.TryParse(ora, out var timespan))
             {
-                Ora = ora,
-                Descriere = descriere
-            });
+                await DisplayAlert("Eroare", "Ora nu este validă!", "OK");
+                return;
+            }
 
-            ActualizeazaProgramari(ziSelectata);
+            var appointment = new Appointment
+            {
+                AppointmentDate = ziSelectata.Date + timespan,
+                Title = titlu,
+                Description = descriere
+            };
+
+            await _database.SaveAppointmentAsync(appointment);
+            LoadAppointments(ziSelectata);
             await DisplayAlert("Succes", "Programare adăugată!", "OK");
         }
     }
 
     private async void OnViewAllAppointmentsClicked(object sender, EventArgs e)
     {
-        var toate = _programariPeZi
-            .OrderBy(p => p.Key)
-            .SelectMany(p => p.Value.Select(x => $"{p.Key:dd.MM.yyyy} - {x.Ora} - {x.Descriere}"))
+        var toate = await _database.GetAppointmentsAsync();
+        var lista = toate
+            .OrderBy(p => p.AppointmentDate)
+            .Select(x => $"{x.AppointmentDate:dd.MM.yyyy} - {x.AppointmentDate:HH:mm} - {x.Title} - {x.Description}")
             .ToList();
 
-        string mesaj = toate.Any()
-            ? string.Join("\n", toate)
+        string mesaj = lista.Any()
+            ? string.Join("\n", lista)
             : "Nu există programări.";
 
         await DisplayAlert("Toate programările", mesaj, "OK");
     }
-}
-
-public class AppointmentModel
-{
-    public string Ora { get; set; }
-    public string Descriere { get; set; }
 }

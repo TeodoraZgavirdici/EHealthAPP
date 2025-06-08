@@ -1,4 +1,5 @@
 ﻿using EHealthApp.Data;
+using Microsoft.Maui.Storage;
 using Syncfusion.Licensing;
 
 namespace EHealthApp;
@@ -28,6 +29,19 @@ public partial class App : Application
         SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF1cWWhPYVtpR2Nbek5xdV9HZ1ZUQGYuP1ZhSXxWdkNjWH5fcXNQQmJVU0d9XUs=\r\n");
 
         InitializeComponent();
-        MainPage = new AppShell();
+
+        // LOGIN PERSISTENT:
+        string loggedUser = Preferences.Get("logged_user", null);
+
+        if (!string.IsNullOrEmpty(loggedUser))
+        {
+            // User logat, sari la AppShell (Home)
+            MainPage = new AppShell();
+        }
+        else
+        {
+            // Niciun user logat, mergi la LoginPage
+            MainPage = new LoginPage();
+        }
     }
 }
