@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using EHealthApp.Data;
+﻿using EHealthApp.Data;
 using Syncfusion.Licensing;
 
 namespace EHealthApp;

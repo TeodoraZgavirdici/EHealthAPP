@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-
-namespace EHealthApp
+﻿namespace EHealthApp
 {
     public partial class MainPage : ContentPage
     {

@@ -1,7 +1,4 @@
 ﻿using EHealthApp.Data;
-using Microsoft.Maui.Controls;
-using System;
-using EHealthApp.Models;
 
 namespace EHealthApp
 {
@@ -21,41 +18,34 @@ namespace EHealthApp
 
         private async void OnSignupClicked(object sender, EventArgs e)
         {
-            string username = UsernameEntry.Text?.Trim(); // <-- Nou!
-            string name = NameEntry.Text?.Trim();
             string email = EmailEntry.Text?.Trim();
             string password = PasswordEntry.Text;
+            string confirmPassword = ConfirmPasswordEntry.Text;
 
-            if (string.IsNullOrEmpty(username) ||
-                string.IsNullOrEmpty(name) ||
-                string.IsNullOrEmpty(email) ||
-                string.IsNullOrEmpty(password))
+            // Exemplu: verificăm să fie completate toate câmpurile
+            if (string.IsNullOrEmpty(email) ||
+                string.IsNullOrEmpty(password) ||
+                string.IsNullOrEmpty(confirmPassword))
             {
-                MessageLabel.Text = "Completează toate câmpurile!";
-                MessageLabel.IsVisible = true;
+                await DisplayAlert("Eroare", "Completează toate câmpurile!", "OK");
                 return;
             }
 
-            var existingUser = await _database.GetUserByUsernameAsync(username); // caută după username!
-            if (existingUser != null)
+            if (password != confirmPassword)
             {
-                MessageLabel.Text = "Username-ul este deja folosit!";
-                MessageLabel.IsVisible = true;
+                await DisplayAlert("Eroare", "Parolele nu coincid!", "OK");
                 return;
             }
 
             var existingEmail = await _database.GetUserByEmailAsync(email);
             if (existingEmail != null)
             {
-                MessageLabel.Text = "Email-ul este deja folosit!";
-                MessageLabel.IsVisible = true;
+                await DisplayAlert("Eroare", "Email-ul este deja folosit!", "OK");
                 return;
             }
 
             var user = new User
             {
-                Name = name,
-                Username = username, // <-- Asta contează!
                 Email = email,
                 Password = password
             };
@@ -63,6 +53,12 @@ namespace EHealthApp
             await _database.SaveUserAsync(user);
 
             await DisplayAlert("Succes", "Cont creat cu succes!", "OK");
+            await Shell.Current.GoToAsync("..");
+        }
+
+        private async void OnLoginClicked(object sender, EventArgs e)
+        {
+            // Navighează către pagina de login (presupunând că ai o rută definită în Shell)
             await Shell.Current.GoToAsync("..");
         }
     }

@@ -1,8 +1,5 @@
-﻿using SQLite;
-using EHealthApp.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using EHealthApp.Data;
+﻿using EHealthApp.Models;
+using SQLite;
 
 
 namespace EHealthApp.Data

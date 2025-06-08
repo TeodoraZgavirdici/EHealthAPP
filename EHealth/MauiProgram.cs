@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui.Hosting;
-using EHealthApp.Data; // Namespace-ul tău pentru AppDatabase
+﻿using EHealthApp.Data; // Namespace-ul tău pentru AppDatabase
 
 namespace EHealthApp;
 

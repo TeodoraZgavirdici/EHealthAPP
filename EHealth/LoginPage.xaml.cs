@@ -1,6 +1,5 @@
 ﻿
 using EHealthApp.Data;
-using Microsoft.Maui.Controls;
 
 namespace EHealthApp
 {

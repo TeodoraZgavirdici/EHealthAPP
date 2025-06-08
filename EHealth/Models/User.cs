@@ -2,7 +2,7 @@
 
 namespace EHealthApp.Data
 {
-    public class User: IRecord
+    public class User : IRecord
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
