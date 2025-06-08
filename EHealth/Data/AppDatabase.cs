@@ -1,7 +1,6 @@
 ﻿using EHealthApp.Models;
 using SQLite;
 
-
 namespace EHealthApp.Data
 {
     public class AppDatabase
@@ -97,9 +96,12 @@ namespace EHealthApp.Data
         /// </summary>
         public Task<List<Appointment>> GetAppointmentsByDateAsync(System.DateTime date)
         {
+            // SQLite-net nu suportă a.AppointmentDate.Date direct!
+            var start = date.Date;
+            var end = date.Date.AddDays(1);
             return _database.Table<Appointment>()
-            .Where(a => a.AppointmentDate.Date == date.Date)
-            .ToListAsync();
+                .Where(a => a.AppointmentDate >= start && a.AppointmentDate < end)
+                .ToListAsync();
         }
 
         // MedicalDocuments
@@ -145,7 +147,6 @@ namespace EHealthApp.Data
             return DeleteAsync(prescription);
         }
     }
-
 
     public interface IRecord
     {
