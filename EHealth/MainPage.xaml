@@ -25,6 +25,7 @@
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
             <StackLayout>
+                <Button Text="Documente medicale" Clicked="OnDocumenteMedicaleClicked"/>
                 <Button Text="Add User" Clicked="OnAddUserClicked" />
                 <Button Text="Show Users" Clicked="OnShowUsersClicked" />
             </StackLayout>

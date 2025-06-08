@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using CommunityToolkit.Maui.Storage;
 using System.Threading.Tasks;
 // Rezolvă ambiguitatea pentru Image
 using ImageSharpImage = SixLabors.ImageSharp.Image;
@@ -24,8 +25,23 @@ namespace EHealthApp
         public MedicalDocumentsPage()
         {
             InitializeComponent();
+            RequestPermissionsAsync();
             LoadDocuments();
             DocumentsCollectionView.ItemsSource = DocumentsGrouped;
+        }
+
+        // Metodă async pentru cerere permisiuni
+        private async void RequestPermissionsAsync()
+        {
+#if ANDROID
+            var cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
+            if (cameraStatus != PermissionStatus.Granted)
+            {
+                await DisplayAlert("Permisiuni necesare",
+                    "Trebuie să acorzi permisiunea de cameră pentru a folosi această funcționalitate.",
+                    "OK");
+            }
+#endif
         }
 
         // Structuri pentru grupare și afișare documente
@@ -136,43 +152,30 @@ namespace EHealthApp
             }
         }
 
+        // NOU: Metoda multiplatform pentru download
         private async void OnDownloadClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string filePath)
             {
                 var fileName = Path.GetFileName(filePath);
-#if ANDROID || IOS
+
                 try
                 {
-                    var downloads = Path.Combine(FileSystem.Current.AppDataDirectory, "..", "Download");
-                    Directory.CreateDirectory(downloads);
-                    var dest = Path.Combine(downloads, fileName);
-                    File.Copy(filePath, dest, overwrite: true);
-                    await Toast.Make($"Salvat în Download: {fileName}").Show();
+                    using var stream = File.OpenRead(filePath);
+                    var result = await FileSaver.Default.SaveAsync(
+                        fileName,
+                        stream,
+                        default);
+
+                    if (result.IsSuccessful)
+                        await Toast.Make($"PDF salvat cu succes!").Show();
+                    else
+                        await Toast.Make("Eroare la salvare!").Show();
                 }
                 catch
                 {
                     await Toast.Make("Eroare la descărcare!").Show();
                 }
-#elif WINDOWS
-                var savePicker = new Windows.Storage.Pickers.FileSavePicker();
-                var hwnd = ((MauiWinUIWindow)App.Current.Windows[0].Handler.PlatformView).WindowHandle;
-                savePicker.InitializeWithWindow(hwnd);
-                savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
-                savePicker.FileTypeChoices.Add("PDF", new List<string>() { ".pdf" });
-                savePicker.SuggestedFileName = fileName;
-
-                var file = await savePicker.PickSaveFileAsync();
-                if (file != null)
-                {
-                    using (var stream = await file.OpenStreamForWriteAsync())
-                    using (var src = File.OpenRead(filePath))
-                    {
-                        await src.CopyToAsync(stream);
-                    }
-                    await Toast.Make($"PDF descărcat: {fileName}").Show();
-                }
-#endif
             }
         }
     }

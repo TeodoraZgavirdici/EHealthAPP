@@ -18,7 +18,10 @@
             // Logica pentru afișarea utilizatorilor
             DisplayAlert("Show Users", "Show Users button clicked!", "OK");
         }
-
+        private async void OnDocumenteMedicaleClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new MedicalDocumentsPage());
+        }
         private void OnCounterClicked(object sender, EventArgs e)
         {
             // Exemplu logică pentru butonul de incrementare
