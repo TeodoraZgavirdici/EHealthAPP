@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst;net9.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net8.0-android;net8.0-maccatalyst</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>EHealth</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -36,29 +36,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.70" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.20" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="Syncfusion.Maui.Calendar" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Maui.Calendar" Version="28.4.54" />
 	</ItemGroup>
 
-	<!-- Include all your pages as <Page Include=.../> -->
 	<ItemGroup>
 		<Page Include="App.xaml" />
 		<Page Include="AppShell.xaml" />
 		<Page Include="LoginPage.xaml" />
 		<Page Include="MainPage.xaml" />
 		<Page Include="SignupPage.xaml" />
+		<Page Include="AppointmentsPage.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Folder Include="Platforms\Android\NewFolder\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiXaml Update="AppointmentsPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
