@@ -3,16 +3,12 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using CommunityToolkit.Maui.Storage;
 using System.Threading.Tasks;
-// Rezolvă ambiguitatea pentru Image
-using ImageSharpImage = SixLabors.ImageSharp.Image;
 
 namespace EHealthApp
 {
@@ -30,7 +26,6 @@ namespace EHealthApp
             DocumentsCollectionView.ItemsSource = DocumentsGrouped;
         }
 
-        // Metodă async pentru cerere permisiuni
         private async void RequestPermissionsAsync()
         {
 #if ANDROID
@@ -44,7 +39,6 @@ namespace EHealthApp
 #endif
         }
 
-        // Structuri pentru grupare și afișare documente
         public class CategoryGroup : ObservableCollection<DocumentDTO>
         {
             public string Category { get; set; }
@@ -87,9 +81,19 @@ namespace EHealthApp
             bool adaugaAlta;
             do
             {
-                var photo = await MediaPicker.CapturePhotoAsync();
+                FileResult? photo = null;
+                try
+                {
+                    photo = await MediaPicker.CapturePhotoAsync();
+                }
+                catch (Exception ex)
+                {
+                    await Toast.Make($"Eroare la captură: {ex.Message}").Show();
+                }
+
                 if (photo != null)
                 {
+                    await Toast.Make($"Tip fișier: {photo.ContentType}, extensie: {Path.GetExtension(photo.FileName)}").Show();
                     capturedPhotos.Add(photo);
                 }
                 adaugaAlta = await DisplayAlert("Pagină nouă?", "Mai adaugi o pagină la acest document?", "DA", "NU");
@@ -104,55 +108,88 @@ namespace EHealthApp
                 Directory.CreateDirectory(folder);
 
                 string pdfPath = Path.Combine(folder, $"Document_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-                await GeneratePdfFromImagesAsync(capturedPhotos, pdfPath);
 
+                await Toast.Make("Începe generarea PDF...").Show();
+                await GeneratePdfFromImagesAsync(capturedPhotos, pdfPath);
                 await Toast.Make("Document salvat!").Show();
 
                 LoadDocuments(); // Refresh lista
             }
+            else
+            {
+                await Toast.Make("Nu ai selectat o categorie sau nu ai adăugat poze!").Show();
+            }
         }
 
+        // Varianta FARA ImageSharp: se insereaza direct JPG-urile in PDF
         private async Task GeneratePdfFromImagesAsync(List<FileResult> photos, string pdfPath)
         {
-            var pdf = new PdfDocument();
-            foreach (var photo in photos)
+            try
             {
-                using var stream = await photo.OpenReadAsync();
-                using var ms = new MemoryStream();
-                // Conversie imagine cu ImageSharp pentru compatibilitate cu PdfSharpCore
-                using (var img = ImageSharpImage.Load<Rgba32>(stream))
+                var pdf = new PdfDocument();
+                foreach (var photo in photos)
                 {
-                    img.SaveAsJpeg(ms);
+                    try
+                    {
+                        await Toast.Make($"Procesez {photo.FileName}").Show();
+                        using var stream = await photo.OpenReadAsync();
+                        await Toast.Make($"Stream length: {stream.Length}").Show();
+                        await Toast.Make($"ContentType: {photo.ContentType}").Show();
+
+                        using var xImage = XImage.FromStream(() => stream);
+                        var page = pdf.AddPage();
+                        page.Width = xImage.PixelWidth * 72 / xImage.HorizontalResolution;
+                        page.Height = xImage.PixelHeight * 72 / xImage.VerticalResolution;
+
+                        using (var gfx = XGraphics.FromPdfPage(page))
+                        {
+                            gfx.DrawImage(xImage, 0, 0, page.Width, page.Height);
+                        }
+
+                        await Toast.Make($"Adăugat imaginea!").Show();
+                    }
+                    catch (Exception ex)
+                    {
+                        await Toast.Make($"Eroare la procesare imagine: {ex.GetType().Name}: {ex.Message}").Show();
+                        return;
+                    }
                 }
-                ms.Position = 0;
-
-                using var xImage = XImage.FromStream(() => ms);
-                var page = pdf.AddPage();
-                page.Width = xImage.PixelWidth * 72 / xImage.HorizontalResolution;
-                page.Height = xImage.PixelHeight * 72 / xImage.VerticalResolution;
-
-                using (var gfx = XGraphics.FromPdfPage(page))
+                try
                 {
-                    gfx.DrawImage(xImage, 0, 0, page.Width, page.Height);
+                    using var file = File.Create(pdfPath);
+                    pdf.Save(file);
+                    await Toast.Make("PDF generat!").Show();
+                }
+                catch (Exception exSave)
+                {
+                    await Toast.Make($"Eroare la salvarea PDF: {exSave.GetType().Name}: {exSave.Message}").Show();
                 }
             }
-            using var file = File.Create(pdfPath);
-            pdf.Save(file);
+            catch (Exception ex)
+            {
+                await Toast.Make($"Eroare generală la generarea PDF: {ex.GetType().Name}: {ex.Message}").Show();
+            }
         }
 
         private async void OnShareClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string filePath)
             {
-                await Share.RequestAsync(new ShareFileRequest
+                try
                 {
-                    Title = "Share document",
-                    File = new ShareFile(filePath)
-                });
+                    await Share.RequestAsync(new ShareFileRequest
+                    {
+                        Title = "Share document",
+                        File = new ShareFile(filePath)
+                    });
+                }
+                catch (Exception ex)
+                {
+                    await Toast.Make($"Eroare la share: {ex.GetType().Name}: {ex.Message}").Show();
+                }
             }
         }
 
-        // NOU: Metoda multiplatform pentru download
         private async void OnDownloadClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string filePath)
@@ -172,9 +209,9 @@ namespace EHealthApp
                     else
                         await Toast.Make("Eroare la salvare!").Show();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    await Toast.Make("Eroare la descărcare!").Show();
+                    await Toast.Make($"Eroare la descărcare: {ex.GetType().Name}: {ex.Message}").Show();
                 }
             }
         }
