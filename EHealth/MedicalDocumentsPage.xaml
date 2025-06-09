@@ -4,102 +4,133 @@
     x:Class="EHealthApp.MedicalDocumentsPage"
     Title="Documente medicale">
 
-	<VerticalStackLayout Spacing="16" Padding="16">
+	<ScrollView>
+		<VerticalStackLayout Padding="20" Spacing="20">
 
-		<!-- Presupun că butonul principal e mov: #9C27B0 (Purple 500) -->
-		<Button
-            Text="Adaugă document medical"
-            Clicked="OnAddMedicalDocumentClicked"
-            HorizontalOptions="Fill"
-            BackgroundColor="#9C27B0"
-            TextColor="White" />
+			<!-- Buton pentru adăugare document -->
+			<Button
+                Text="Adaugă document medical"
+                Clicked="OnAddMedicalDocumentClicked"
+                BackgroundColor="#9C27B0"
+                TextColor="White"
+                CornerRadius="12"
+                HeightRequest="50"
+                HorizontalOptions="Fill" />
 
-		<Label
-            Text="Categorii:"
-            FontAttributes="Bold"
-            FontSize="16" />
+			<!-- Titlu Categorii -->
+			<Label
+                Text="Categorii:"
+                FontAttributes="Bold"
+                FontSize="18" />
 
-		<CollectionView
-            x:Name="CategoriesCollectionView"
-            ItemsSource="{Binding Categories}"
-            SelectionMode="Single"
-            SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-            HeightRequest="60"
-            BackgroundColor="Transparent"
-            Margin="0,0,0,12">
-			<CollectionView.ItemsLayout>
-				<LinearItemsLayout Orientation="Horizontal"/>
-			</CollectionView.ItemsLayout>
-			<CollectionView.ItemTemplate>
-				<DataTemplate>
-					<Frame
-                        Padding="18,8"
-                        Margin="8,0"
-                        CornerRadius="18"
-                        HasShadow="True"
+			<!-- Lista de categorii -->
+			<CollectionView
+                x:Name="CategoriesCollectionView"
+                ItemsSource="{Binding Categories}"
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                HeightRequest="60">
+				<CollectionView.ItemsLayout>
+					<LinearItemsLayout Orientation="Horizontal" ItemSpacing="12"/>
+				</CollectionView.ItemsLayout>
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<Frame
+                            Padding="16,8"
+                            CornerRadius="18"
+                            HasShadow="False"
+                            BackgroundColor="#9C27B0"
+                            BorderColor="#7B1FA2">
+							<VisualStateManager.VisualStateGroups>
+								<VisualStateGroupList>
+									<VisualStateGroup Name="CommonStates">
+										<VisualState Name="Normal">
+											<VisualState.Setters>
+												<Setter Property="BackgroundColor" Value="#9C27B0"/>
+												<Setter Property="BorderColor" Value="#7B1FA2"/>
+											</VisualState.Setters>
+										</VisualState>
+										<VisualState Name="Selected">
+											<VisualState.Setters>
+												<Setter Property="BackgroundColor" Value="#7B1FA2"/>
+												<Setter Property="BorderColor" Value="#4A0072"/>
+											</VisualState.Setters>
+										</VisualState>
+									</VisualStateGroup>
+								</VisualStateGroupList>
+							</VisualStateManager.VisualStateGroups>
+							<Label
+                                Text="{Binding Name}"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+						</Frame>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+
+			<!-- Titlu Documente -->
+			<Label
+                Text="Documente:"
+                FontAttributes="Bold"
+                FontSize="18" />
+
+			<!-- Lista documentelor -->
+			<CollectionView
+                x:Name="DocumentsCollectionView"
+                ItemsSource="{Binding FilteredDocuments}">
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<Frame
+                            Margin="0,4"
+                            Padding="12"
+                            CornerRadius="12"
+                            BorderColor="#DDD">
+							<VerticalStackLayout Spacing="8">
+
+								<Label
+                                    Text="{Binding FileName}"
+                                    FontSize="16"
+                                    FontAttributes="Bold"
+                                    TextColor="#333" />
+
+								<HorizontalStackLayout Spacing="12">
+									<Button
+                                        Text="Share"
+                                        Clicked="OnShareClicked"
+                                        CommandParameter="{Binding FilePath}"
+                                        BackgroundColor="#EDE7F6"
+                                        TextColor="#4A0072"
+                                        CornerRadius="8"
+                                        Padding="12,6" />
+
+									<Button
+                                        Text="Descarcă"
+                                        Clicked="OnDownloadClicked"
+                                        CommandParameter="{Binding FilePath}"
+                                        BackgroundColor="#EDE7F6"
+                                        TextColor="#4A0072"
+                                        CornerRadius="8"
+                                        Padding="12,6" />
+								</HorizontalStackLayout>
+							</VerticalStackLayout>
+						</Frame>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+
+				<CollectionView.EmptyView>
+					<Label
+                        Text="Nu există documente în această categorie."
+                        FontAttributes="Italic"
+                        TextColor="Gray"
+                        HorizontalOptions="Center"
                         VerticalOptions="Center"
-                        HorizontalOptions="Center">
-						<VisualStateManager.VisualStateGroups>
-							<VisualStateGroupList>
-								<VisualStateGroup Name="CommonStates">
-									<VisualState Name="Normal">
-										<VisualState.Setters>
-											<Setter Property="BackgroundColor" Value="#9C27B0"/>
-											<Setter Property="BorderColor" Value="#7B1FA2"/>
-										</VisualState.Setters>
-									</VisualState>
-									<VisualState Name="Selected">
-										<VisualState.Setters>
-											<Setter Property="BackgroundColor" Value="#7B1FA2"/>
-											<Setter Property="BorderColor" Value="#4A0072"/>
-										</VisualState.Setters>
-									</VisualState>
-								</VisualStateGroup>
-							</VisualStateGroupList>
-						</VisualStateManager.VisualStateGroups>
-						<Label Text="{Binding Name}"
-                               FontAttributes="Bold"
-                               FontSize="16"
-                               TextColor="White"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Center"/>
-					</Frame>
-				</DataTemplate>
-			</CollectionView.ItemTemplate>
-		</CollectionView>
+                        Padding="12"/>
+				</CollectionView.EmptyView>
+			</CollectionView>
 
-		<Label
-            Text="Documente:"
-            FontAttributes="Bold"
-            FontSize="16"
-            Margin="0,0,0,4"/>
-
-		<CollectionView
-            x:Name="DocumentsCollectionView"
-            ItemsSource="{Binding FilteredDocuments}">
-			<CollectionView.ItemTemplate>
-				<DataTemplate>
-					<Frame Margin="0,2" Padding="8,6" CornerRadius="10" BorderColor="#E0E0E0">
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="Auto" />
-								<ColumnDefinition Width="Auto" />
-							</Grid.ColumnDefinitions>
-							<Label Text="{Binding FileName}" VerticalOptions="Center"/>
-							<Button Grid.Column="1" Text="Share" Clicked="OnShareClicked" CommandParameter="{Binding FilePath}" Padding="0,0,8,0"/>
-							<Button Grid.Column="2" Text="Descarcă" Clicked="OnDownloadClicked" CommandParameter="{Binding FilePath}" Padding="0"/>
-						</Grid>
-					</Frame>
-				</DataTemplate>
-			</CollectionView.ItemTemplate>
-			<CollectionView.EmptyView>
-				<Label Text="Nu există documente în această categorie."
-                       FontAttributes="Italic"
-                       TextColor="Gray"
-                       Padding="12"/>
-			</CollectionView.EmptyView>
-		</CollectionView>
-
-	</VerticalStackLayout>
+		</VerticalStackLayout>
+	</ScrollView>
 </ContentPage>
