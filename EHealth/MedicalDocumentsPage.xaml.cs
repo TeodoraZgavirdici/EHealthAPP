@@ -7,12 +7,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using EHealthApp.Data;
 using EHealthApp.Models;
 
 namespace EHealthApp
 {
-    public partial class MedicalDocumentsPage : ContentPage
+    public partial class MedicalDocumentsPage : ContentPage, System.ComponentModel.INotifyPropertyChanged
     {
         private readonly AppDatabase _database;
 
@@ -41,17 +42,20 @@ namespace EHealthApp
             }
         }
 
+        public ICommand SelectCategoryCommand { get; }
+
         public MedicalDocumentsPage(AppDatabase database)
         {
             InitializeComponent();
             _database = database;
             BindingContext = this;
-
-            if (Categories.Any())
+            SelectCategoryCommand = new Command<CategoryDTO>(cat =>
             {
+                if (cat != null && SelectedCategory != cat)
+                    SelectedCategory = cat;
+            });
+            if (Categories.Any())
                 SelectedCategory = Categories[0];
-                _ = LoadDocumentsForCategoryAsync(SelectedCategory.Name);
-            }
         }
 
         public class CategoryDTO
@@ -65,43 +69,87 @@ namespace EHealthApp
             public string FilePath { get; set; }
         }
 
-        private async Task LoadDocumentsForCategoryAsync(string category)
+        // ====== 1. Capture multiple photos using the camera ======
+        private async Task<List<FileResult>> CaptureMultiplePhotosAsync()
         {
-            FilteredDocuments.Clear();
-
-            if (string.IsNullOrWhiteSpace(category))
-                return;
-
-            var documents = await _database.GetMedicalDocumentsByCategoryAsync(category);
-
-            foreach (var doc in documents.OrderByDescending(d => d.DateAdded))
-            {
-                if (File.Exists(doc.FilePath))
-                {
-                    FilteredDocuments.Add(new DocumentDTO
-                    {
-                        FileName = doc.Title,
-                        FilePath = doc.FilePath
-                    });
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"Fișier lipsă: {doc.FilePath}");
-                    await _database.DeleteMedicalDocumentAsync(doc);
-                }
-            }
-        }
-
-        private async void OnAddMedicalDocumentClicked(object sender, EventArgs e)
-        {
-            try
+            var photos = new List<FileResult>();
+            bool addMore = true;
+            while (addMore)
             {
                 var photo = await MediaPicker.CapturePhotoAsync();
                 if (photo == null)
+                    break;
+                photos.Add(photo);
+                addMore = await DisplayAlert("Adaugă poze", "Vrei să faci încă o poză pentru PDF?", "Da", "Nu");
+            }
+            return photos;
+        }
+
+        // ====== 2. Save captured photos to a local temporary folder ======
+        private async Task<List<string>> CopyPhotoFilesLocallyAsync(List<FileResult> photos)
+        {
+            List<string> localPaths = new();
+            foreach (var file in photos)
+            {
+                var localPath = Path.Combine(FileSystem.CacheDirectory, file.FileName);
+                using var inStream = await file.OpenReadAsync();
+                using var outStream = File.OpenWrite(localPath);
+                await inStream.CopyToAsync(outStream);
+                localPaths.Add(localPath);
+            }
+            return localPaths;
+        }
+
+        // ====== 3. Generate PDF from all images ======
+        private async Task<bool> GeneratePdfFromImageListAsync(List<string> imagePaths, string pdfPath)
+        {
+            try
+            {
+                using var document = new PdfDocument();
+                foreach (var imagePath in imagePaths)
+                {
+                    if (!File.Exists(imagePath))
+                        continue;
+
+                    using var imageStream = File.OpenRead(imagePath);
+                    var image = new PdfBitmap(imageStream);
+                    var page = document.Pages.Add();
+                    var pageSize = page.GetClientSize();
+
+                    // Scaling image to fit the page
+                    float ratioX = pageSize.Width / image.Width;
+                    float ratioY = pageSize.Height / image.Height;
+                    float ratio = Math.Min(ratioX, ratioY);
+                    float width = image.Width * ratio;
+                    float height = image.Height * ratio;
+                    page.Graphics.DrawImage(image, 0, 0, width, height);
+                }
+
+                using var outputStream = File.Create(pdfPath);
+                document.Save(outputStream);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await Toast.Make("Eroare PDF: " + ex.Message).Show();
+                return false;
+            }
+        }
+
+        // ====== 4. Full workflow: Take photos, generate PDF, save record ======
+        private async void OnAddPhotoPdfDocumentClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var photoFiles = await CaptureMultiplePhotosAsync();
+                if (photoFiles.Count == 0)
+                {
+                    await Toast.Make("Nu s-a făcut nicio poză!").Show();
                     return;
+                }
 
                 var categorie = await DisplayActionSheet("Alege categoria", "Anulează", null, Categories.Select(c => c.Name).ToArray());
-                if (string.IsNullOrEmpty(categorie))
+                if (string.IsNullOrEmpty(categorie) || categorie == "Anulează")
                     return;
 
                 var titlu = await DisplayPromptAsync("Titlu document", "Introdu un nume pentru fișierul PDF:");
@@ -110,13 +158,14 @@ namespace EHealthApp
 
                 string folder = Path.Combine(FileSystem.AppDataDirectory, categorie);
                 Directory.CreateDirectory(folder);
-
                 string pdfPath = Path.Combine(folder, $"{titlu}.pdf");
 
-                bool pdfCreated = await GeneratePdfFromImageAsync(photo.FullPath, pdfPath);
+                var photoLocalPaths = await CopyPhotoFilesLocallyAsync(photoFiles);
+
+                bool pdfCreated = await GeneratePdfFromImageListAsync(photoLocalPaths, pdfPath);
                 if (!pdfCreated)
                 {
-                    await Toast.Make("Nu s-a putut crea PDF-ul").Show();
+                    await Toast.Make("Nu s-a putut crea PDF-ul!").Show();
                     return;
                 }
 
@@ -131,7 +180,6 @@ namespace EHealthApp
                 await _database.SaveMedicalDocumentAsync(medicalDoc);
 
                 SelectedCategory = Categories.FirstOrDefault(c => c.Name == categorie);
-
                 await Toast.Make("Document salvat cu succes!").Show();
             }
             catch (Exception ex)
@@ -140,51 +188,25 @@ namespace EHealthApp
             }
         }
 
-        /// <summary>
-        /// Generează un PDF dintr-o imagine, adaptând dimensiunea imaginii să încapă pe pagina implicită A4, păstrând proporțiile.
-        /// </summary>
-        private async Task<bool> GeneratePdfFromImageAsync(string imagePath, string pdfPath)
+        // ====== 5. Load existing documents for the selected category ======
+        private async Task LoadDocumentsForCategoryAsync(string category)
         {
-            try
+            FilteredDocuments.Clear();
+            var docs = await _database.GetMedicalDocumentsByCategoryAsync(category);
+            if (docs != null)
             {
-                using var document = new PdfDocument();
-
-                // Adaugă pagina implicită (A4)
-                var page = document.Pages.Add();
-
-                using var imageStream = File.OpenRead(imagePath);
-                var image = new PdfBitmap(imageStream);
-
-                // Obține dimensiunea paginii (A4 implicit)
-                var pageSize = page.GetClientSize();
-
-                // Dimensiunea imaginii
-                float imgWidth = image.Width;
-                float imgHeight = image.Height;
-
-                // Calculează raportul de scalare astfel încât imaginea să încapă pe pagină păstrând proporțiile
-                float ratioX = pageSize.Width / imgWidth;
-                float ratioY = pageSize.Height / imgHeight;
-                float ratio = Math.Min(ratioX, ratioY);
-
-                float width = imgWidth * ratio;
-                float height = imgHeight * ratio;
-
-                // Desenează imaginea scalată în colțul din stânga sus al paginii
-                page.Graphics.DrawImage(image, 0, 0, width, height);
-
-                using var outputStream = File.Create(pdfPath);
-                document.Save(outputStream);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Eroare generare PDF Syncfusion: {ex.Message}");
-                return false;
+                foreach (var doc in docs)
+                {
+                    FilteredDocuments.Add(new DocumentDTO
+                    {
+                        FileName = Path.GetFileName(doc.FilePath),
+                        FilePath = doc.FilePath
+                    });
+                }
             }
         }
 
+        // ====== 6. Share a PDF ======
         private async void OnShareClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string path && File.Exists(path))
@@ -201,6 +223,7 @@ namespace EHealthApp
             }
         }
 
+        // ====== 7. Download (Save as...) PDF ======
         private async void OnDownloadClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string path && File.Exists(path))
@@ -216,6 +239,7 @@ namespace EHealthApp
             }
         }
 
+        // ====== PropertyChanged handler ======
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));

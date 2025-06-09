@@ -1,71 +1,72 @@
 ﻿<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:EHealthApp.Converters"
     x:Class="EHealthApp.MedicalDocumentsPage"
     Title="Documente medicale"
     BackgroundColor="White">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+    <ContentPage.Resources>
+        <local:CategoryBgConverter x:Key="CategoryBgConverter" />
+        <local:CategoryBorderConverter x:Key="CategoryBorderConverter" />
+        <local:CategoryTextConverter x:Key="CategoryTextConverter" />
+    </ContentPage.Resources>
 
-            <!-- Buton adaugă document -->
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <!-- Adaugă document medical DIN POZE -->
             <Button
                 Text="Adaugă document medical"
-                Clicked="OnAddMedicalDocumentClicked"
-                BackgroundColor="#2E7D32"
-                TextColor="White"
+                Clicked="OnAddPhotoPdfDocumentClicked"
+                FontSize="17"
                 CornerRadius="12"
-                HeightRequest="50"
+                BackgroundColor="#388E3C"
+                TextColor="White"
+                FontAttributes="Bold"
+                HeightRequest="52"
                 HorizontalOptions="Fill" />
 
             <!-- Titlu categorii -->
             <Label
                 Text="Categorii:"
+                FontSize="17"
                 FontAttributes="Bold"
-                FontSize="18"
-                TextColor="#2E7D32" />
+                TextColor="#388E3C" />
 
-            <!-- Lista categorii -->
+            <!-- CATEGORII -->
             <CollectionView
                 x:Name="CategoriesCollectionView"
                 ItemsSource="{Binding Categories}"
-                SelectionMode="Single"
-                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-                HeightRequest="60">
+                SelectionMode="None"
+                HeightRequest="56"
+                Margin="0,0,0,8">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" />
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame
-                            Padding="16,8"
-                            CornerRadius="18"
+                            Padding="0"
+                            CornerRadius="16"
                             HasShadow="False"
-                            BackgroundColor="#81C784"
-                            BorderColor="#388E3C">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup Name="CommonStates">
-                                    <VisualState Name="Normal">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="#81C784" />
-                                            <Setter Property="BorderColor" Value="#388E3C" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState Name="Selected">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="#388E3C" />
-                                            <Setter Property="BorderColor" Value="#1B5E20" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
+                            HeightRequest="44"
+                            WidthRequest="120"
+                            BorderColor="{Binding ., Converter={StaticResource CategoryBorderConverter}, ConverterParameter={x:Reference CategoriesCollectionView}}"
+                            BackgroundColor="{Binding ., Converter={StaticResource CategoryBgConverter}, ConverterParameter={x:Reference CategoriesCollectionView}}">
                             <Label
                                 Text="{Binding Name}"
-                                TextColor="White"
+                                FontSize="15"
                                 FontAttributes="Bold"
-                                FontSize="14"
+                                VerticalOptions="Center"
                                 HorizontalOptions="Center"
-                                VerticalOptions="Center" />
+                                Padding="14,7"
+                                TextColor="{Binding ., Converter={StaticResource CategoryTextConverter}, ConverterParameter={x:Reference CategoriesCollectionView}}"/>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference CategoriesCollectionView}, Path=BindingContext.SelectCategoryCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -74,57 +75,57 @@
             <!-- Titlu documente -->
             <Label
                 Text="Documente:"
+                FontSize="17"
                 FontAttributes="Bold"
-                FontSize="18"
-                TextColor="#2E7D32" />
+                TextColor="#388E3C"
+                Margin="0,10,0,0" />
 
-            <!-- Lista documente -->
+            <!-- LISTA DOCUMENTE -->
             <CollectionView
                 x:Name="DocumentsCollectionView"
                 ItemsSource="{Binding FilteredDocuments}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame
-                            Margin="0,4"
-                            Padding="12"
+                            Margin="0,6"
+                            Padding="14,10"
                             CornerRadius="12"
-                            BorderColor="#C8E6C9"
-                            BackgroundColor="#F1F8E9">
+                            BorderColor="#388E3C"
+                            BackgroundColor="White">
                             <VerticalStackLayout Spacing="8">
                                 <Label
                                     Text="{Binding FileName}"
                                     FontSize="16"
                                     FontAttributes="Bold"
-                                    TextColor="#2E7D32" />
-
+                                    TextColor="#388E3C" />
                                 <HorizontalStackLayout Spacing="12">
                                     <Button
                                         Text="Share"
                                         Clicked="OnShareClicked"
                                         CommandParameter="{Binding FilePath}"
-                                        BackgroundColor="White"
-                                        TextColor="#388E3C"
+                                        BackgroundColor="#E8F5E9"
+                                        TextColor="#1B5E20"
                                         CornerRadius="8"
-                                        Padding="12,6"
-                                        BorderColor="#81C784"
+                                        Padding="14,7"
+                                        FontSize="14"
+                                        BorderColor="#388E3C"
                                         BorderWidth="1" />
-
                                     <Button
                                         Text="Descarcă"
                                         Clicked="OnDownloadClicked"
                                         CommandParameter="{Binding FilePath}"
-                                        BackgroundColor="White"
-                                        TextColor="#388E3C"
+                                        BackgroundColor="#E8F5E9"
+                                        TextColor="#1B5E20"
                                         CornerRadius="8"
-                                        Padding="12,6"
-                                        BorderColor="#81C784"
+                                        Padding="14,7"
+                                        FontSize="14"
+                                        BorderColor="#388E3C"
                                         BorderWidth="1" />
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-
                 <CollectionView.EmptyView>
                     <Label
                         Text="Nu există documente în această categorie."
@@ -135,7 +136,6 @@
                         Padding="12" />
                 </CollectionView.EmptyView>
             </CollectionView>
-
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
