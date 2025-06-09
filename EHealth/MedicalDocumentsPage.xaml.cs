@@ -33,9 +33,12 @@ namespace EHealthApp
             get => _selectedCategory;
             set
             {
-                _selectedCategory = value;
-                LoadDocumentsForCategory(_selectedCategory?.Name);
-                OnPropertyChanged(nameof(SelectedCategory));
+                if (_selectedCategory != value)
+                {
+                    _selectedCategory = value;
+                    LoadDocumentsForCategory(_selectedCategory?.Name);
+                    OnPropertyChanged(nameof(SelectedCategory));
+                }
             }
         }
 
@@ -81,7 +84,12 @@ namespace EHealthApp
             var folder = Path.Combine(FileSystem.AppDataDirectory, category);
             if (Directory.Exists(folder))
             {
-                foreach (var file in Directory.GetFiles(folder, "*.pdf"))
+                // Folosim sortare descrescătoare după dată pentru ca documentele noi să fie primele
+                var files = Directory.GetFiles(folder, "*.pdf")
+                                     .OrderByDescending(File.GetCreationTime)
+                                     .ToList();
+
+                foreach (var file in files)
                 {
                     FilteredDocuments.Add(new DocumentDTO
                     {
@@ -132,8 +140,18 @@ namespace EHealthApp
                 await Toast.Make("Document salvat!").Show();
 
                 // Actualizează lista pentru categoria selectată dacă e aceeași cu cea la care ai adăugat
+                // Dacă nu, schimbă automat categoria la cea la care ai adăugat documentul nou!
                 if (SelectedCategory != null && categorie == SelectedCategory.Name)
+                {
                     LoadDocumentsForCategory(SelectedCategory.Name);
+                }
+                else
+                {
+                    // Schimbă categoria selectată ca să vadă automat documentul nou adăugat!
+                    var found = Categories.FirstOrDefault(c => c.Name == categorie);
+                    if (found != null)
+                        SelectedCategory = found;
+                }
             }
             else
             {
@@ -151,10 +169,7 @@ namespace EHealthApp
                 {
                     try
                     {
-                        await Toast.Make($"Procesez {photo.FileName}").Show();
                         using var stream = await photo.OpenReadAsync();
-                        await Toast.Make($"Stream length: {stream.Length}").Show();
-                        await Toast.Make($"ContentType: {photo.ContentType}").Show();
 
                         using var xImage = XImage.FromStream(() => stream);
                         var page = pdf.AddPage();
@@ -165,8 +180,6 @@ namespace EHealthApp
                         {
                             gfx.DrawImage(xImage, 0, 0, page.Width, page.Height);
                         }
-
-                        await Toast.Make($"Adăugat imaginea!").Show();
                     }
                     catch (Exception ex)
                     {
