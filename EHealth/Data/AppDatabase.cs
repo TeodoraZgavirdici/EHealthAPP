@@ -1,5 +1,9 @@
 ﻿using EHealthApp.Models;
 using SQLite;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EHealthApp.Data
 {
@@ -8,13 +12,14 @@ namespace EHealthApp.Data
         private readonly SQLiteAsyncConnection _database;
 
         /// <summary>
-        /// Constructor: Inițializează conexiunea și creează tabelele necesare.
+        /// Constructor: Inițializează conexiunea SQLite și creează tabelele dacă nu există.
         /// </summary>
+        /// <param name="dbPath">Calea fișierului bazei de date</param>
         public AppDatabase(string dbPath)
         {
             _database = new SQLiteAsyncConnection(dbPath);
 
-            // Crearea tabelelor pentru toate tipurile de entități
+            // Creare tabele - Wait este ok aici în constructor
             _database.CreateTableAsync<User>().Wait();
             _database.CreateTableAsync<Appointment>().Wait();
             _database.CreateTableAsync<MedicalDocument>().Wait();
@@ -24,7 +29,7 @@ namespace EHealthApp.Data
         // ------------------ METODE GENERICE ------------------
 
         /// <summary>
-        /// Returnează toate intrările pentru o anumită entitate.
+        /// Returnează toate intrările dintr-un tabel.
         /// </summary>
         public Task<List<T>> GetAllAsync<T>() where T : new()
         {
@@ -32,7 +37,7 @@ namespace EHealthApp.Data
         }
 
         /// <summary>
-        /// Salvează sau actualizează o entitate în baza de date.
+        /// Inserează sau actualizează un obiect în baza de date.
         /// </summary>
         public Task<int> SaveAsync<T>(T item) where T : IRecord, new()
         {
@@ -40,7 +45,7 @@ namespace EHealthApp.Data
         }
 
         /// <summary>
-        /// Șterge o entitate din baza de date.
+        /// Șterge un obiect din baza de date.
         /// </summary>
         public Task<int> DeleteAsync<T>(T item) where T : IRecord, new()
         {
@@ -50,104 +55,77 @@ namespace EHealthApp.Data
         // ------------------ METODE SPECIFICE ------------------
 
         // Users
-        public Task<List<User>> GetUsersAsync()
-        {
-            return GetAllAsync<User>();
-        }
+        public Task<List<User>> GetUsersAsync() => GetAllAsync<User>();
 
-        public Task<int> SaveUserAsync(User user)
-        {
-            return SaveAsync(user);
-        }
+        public Task<int> SaveUserAsync(User user) => SaveAsync(user);
 
-        public Task<int> DeleteUserAsync(User user)
-        {
-            return DeleteAsync(user);
-        }
+        public Task<int> DeleteUserAsync(User user) => DeleteAsync(user);
 
-        // Appointments
-        public Task<List<Appointment>> GetAppointmentsAsync()
-        {
-            return GetAllAsync<Appointment>();
-        }
-
-        public Task<int> SaveAppointmentAsync(Appointment appointment)
-        {
-            return SaveAsync(appointment);
-        }
-
-        public Task<int> DeleteAppointmentAsync(Appointment appointment)
-        {
-            return DeleteAsync(appointment);
-        }
-
-        /// <summary>
-        /// Găsește o programare după ID.
-        /// </summary>
-        public Task<Appointment> GetAppointmentByIdAsync(int id)
-        {
-            return _database.Table<Appointment>()
-            .Where(a => a.Id == id)
-            .FirstOrDefaultAsync();
-        }
-
-        /// <summary>
-        /// Găsește programările programate pentru o anumită zi.
-        /// </summary>
-        public Task<List<Appointment>> GetAppointmentsByDateAsync(System.DateTime date)
-        {
-            // SQLite-net nu suportă a.AppointmentDate.Date direct!
-            var start = date.Date;
-            var end = date.Date.AddDays(1);
-            return _database.Table<Appointment>()
-                .Where(a => a.AppointmentDate >= start && a.AppointmentDate < end)
-                .ToListAsync();
-        }
-
-        // MedicalDocuments
-        public Task<List<MedicalDocument>> GetMedicalDocumentsAsync()
-        {
-            return GetAllAsync<MedicalDocument>();
-        }
-
-        public Task<int> SaveMedicalDocumentAsync(MedicalDocument document)
-        {
-            return SaveAsync(document);
-        }
-
-        public Task<int> DeleteMedicalDocumentAsync(MedicalDocument document)
-        {
-            return DeleteAsync(document);
-        }
-
-        // Prescriptions
-        public Task<List<Prescription>> GetPrescriptionsAsync()
-        {
-            return GetAllAsync<Prescription>();
-        }
         public Task<User> GetUserByUsernameAsync(string username)
         {
             return _database.Table<User>()
-                            .Where(u => u.Username == username)
-                            .FirstOrDefaultAsync();
+                .Where(u => u.Username == username)
+                .FirstOrDefaultAsync();
         }
+
         public Task<User> GetUserByEmailAsync(string email)
         {
             return _database.Table<User>()
                 .Where(u => u.Email == email)
                 .FirstOrDefaultAsync();
         }
-        public Task<int> SavePrescriptionAsync(Prescription prescription)
+
+        // Appointments
+        public Task<List<Appointment>> GetAppointmentsAsync() => GetAllAsync<Appointment>();
+
+        public Task<int> SaveAppointmentAsync(Appointment appointment) => SaveAsync(appointment);
+
+        public Task<int> DeleteAppointmentAsync(Appointment appointment) => DeleteAsync(appointment);
+
+        public Task<Appointment> GetAppointmentByIdAsync(int id)
         {
-            return SaveAsync(prescription);
+            return _database.Table<Appointment>()
+                .Where(a => a.Id == id)
+                .FirstOrDefaultAsync();
         }
 
-        public Task<int> DeletePrescriptionAsync(Prescription prescription)
+        public Task<List<Appointment>> GetAppointmentsByDateAsync(DateTime date)
         {
-            return DeleteAsync(prescription);
+            // SQLite-net nu suportă direct .Date, deci filtrăm manual pe interval
+            var start = date.Date;
+            var end = start.AddDays(1);
+
+            return _database.Table<Appointment>()
+                .Where(a => a.AppointmentDate >= start && a.AppointmentDate < end)
+                .ToListAsync();
         }
+
+        // MedicalDocuments
+        public Task<List<MedicalDocument>> GetMedicalDocumentsAsync() => GetAllAsync<MedicalDocument>();
+
+        public Task<List<MedicalDocument>> GetMedicalDocumentsByCategoryAsync(string category)
+        {
+            return _database.Table<MedicalDocument>()
+                .Where(d => d.Category == category)
+                .OrderByDescending(d => d.DateAdded)
+                .ToListAsync();
+        }
+
+        public Task<int> SaveMedicalDocumentAsync(MedicalDocument document) => SaveAsync(document);
+
+        public Task<int> DeleteMedicalDocumentAsync(MedicalDocument document) => DeleteAsync(document);
+
+        // Prescriptions
+        public Task<List<Prescription>> GetPrescriptionsAsync() => GetAllAsync<Prescription>();
+
+        public Task<int> SavePrescriptionAsync(Prescription prescription) => SaveAsync(prescription);
+
+        public Task<int> DeletePrescriptionAsync(Prescription prescription) => DeleteAsync(prescription);
     }
 
+    /// <summary>
+    /// Interfață pentru entități cu proprietate Id.
+    /// </summary>
     public interface IRecord
     {
         int Id { get; set; }

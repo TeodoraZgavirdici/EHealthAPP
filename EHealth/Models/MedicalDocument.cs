@@ -9,8 +9,10 @@ namespace EHealthApp.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        public string Title { get; set; } // Titlul documentului (ex: "Analize sânge")
-        public string FilePath { get; set; } // Calea fișierului salvat (local)
-        public DateTime DateAdded { get; set; } // Data adăugării documentului
+        public string Title { get; set; } 
+        public string FilePath { get; set; } 
+        public DateTime DateAdded { get; set; } 
+        public string Category { get; set; } 
+
     }
 }
