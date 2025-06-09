@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Graphics;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace EHealthApp
     {
         private readonly AppDatabase _database;
 
-        public ObservableCollection<CategoryDTO> Categories { get; set; } = new()
+        public ObservableCollection<CategoryDTO> Categories { get; } = new()
         {
             new CategoryDTO { Name = "Retete" },
             new CategoryDTO { Name = "ScrisoriMedicale" },
@@ -24,7 +24,7 @@ namespace EHealthApp
             new CategoryDTO { Name = "Altele" }
         };
 
-        public ObservableCollection<DocumentDTO> FilteredDocuments { get; set; } = new();
+        public ObservableCollection<DocumentDTO> FilteredDocuments { get; } = new();
 
         private CategoryDTO _selectedCategory;
         public CategoryDTO SelectedCategory
@@ -32,9 +32,12 @@ namespace EHealthApp
             get => _selectedCategory;
             set
             {
-                _selectedCategory = value;
-                OnPropertyChanged(nameof(SelectedCategory));
-                _ = LoadDocumentsForCategoryAsync(value?.Name);
+                if (_selectedCategory != value)
+                {
+                    _selectedCategory = value;
+                    OnPropertyChanged(nameof(SelectedCategory));
+                    _ = LoadDocumentsForCategoryAsync(value?.Name);
+                }
             }
         }
 
@@ -42,19 +45,30 @@ namespace EHealthApp
         {
             InitializeComponent();
             _database = database;
-
             BindingContext = this;
 
-            if (Categories.Count > 0)
+            if (Categories.Any())
+            {
                 SelectedCategory = Categories[0];
+                _ = LoadDocumentsForCategoryAsync(SelectedCategory.Name);
+            }
         }
 
-        public class CategoryDTO { public string Name { get; set; } }
-        public class DocumentDTO { public string FileName { get; set; } public string FilePath { get; set; } }
+        public class CategoryDTO
+        {
+            public string Name { get; set; }
+        }
+
+        public class DocumentDTO
+        {
+            public string FileName { get; set; }
+            public string FilePath { get; set; }
+        }
 
         private async Task LoadDocumentsForCategoryAsync(string category)
         {
             FilteredDocuments.Clear();
+
             if (string.IsNullOrWhiteSpace(category))
                 return;
 
@@ -83,10 +97,12 @@ namespace EHealthApp
             try
             {
                 var photo = await MediaPicker.CapturePhotoAsync();
-                if (photo == null) return;
+                if (photo == null)
+                    return;
 
                 var categorie = await DisplayActionSheet("Alege categoria", "Anulează", null, Categories.Select(c => c.Name).ToArray());
-                if (string.IsNullOrEmpty(categorie)) return;
+                if (string.IsNullOrEmpty(categorie))
+                    return;
 
                 var titlu = await DisplayPromptAsync("Titlu document", "Introdu un nume pentru fișierul PDF:");
                 if (string.IsNullOrWhiteSpace(titlu))
@@ -95,7 +111,7 @@ namespace EHealthApp
                 string folder = Path.Combine(FileSystem.AppDataDirectory, categorie);
                 Directory.CreateDirectory(folder);
 
-                string pdfPath = Path.Combine(folder, titlu + ".pdf");
+                string pdfPath = Path.Combine(folder, $"{titlu}.pdf");
 
                 bool pdfCreated = await GeneratePdfFromImageAsync(photo.FullPath, pdfPath);
                 if (!pdfCreated)
@@ -115,6 +131,8 @@ namespace EHealthApp
                 await _database.SaveMedicalDocumentAsync(medicalDoc);
 
                 SelectedCategory = Categories.FirstOrDefault(c => c.Name == categorie);
+
+                await Toast.Make("Document salvat cu succes!").Show();
             }
             catch (Exception ex)
             {
@@ -122,36 +140,47 @@ namespace EHealthApp
             }
         }
 
+        /// <summary>
+        /// Generează un PDF dintr-o imagine, adaptând dimensiunea imaginii să încapă pe pagina implicită A4, păstrând proporțiile.
+        /// </summary>
         private async Task<bool> GeneratePdfFromImageAsync(string imagePath, string pdfPath)
         {
             try
             {
-                using var stream = File.OpenRead(imagePath);
-                using var ms = new MemoryStream();
-                await stream.CopyToAsync(ms);
-                ms.Position = 0;
+                using var document = new PdfDocument();
 
-                using var imageStream = new MemoryStream(ms.ToArray());
-                using var image = XImage.FromStream(() => imageStream);
+                // Adaugă pagina implicită (A4)
+                var page = document.Pages.Add();
 
-                var document = new PdfDocument();
-                var page = document.AddPage();
+                using var imageStream = File.OpenRead(imagePath);
+                var image = new PdfBitmap(imageStream);
 
-                double dpiFactor = 72.0 / image.HorizontalResolution;
-                page.Width = image.PixelWidth * dpiFactor;
-                page.Height = image.PixelHeight * dpiFactor;
+                // Obține dimensiunea paginii (A4 implicit)
+                var pageSize = page.GetClientSize();
 
-                using var gfx = XGraphics.FromPdfPage(page);
-                gfx.DrawImage(image, 0, 0, page.Width, page.Height);
+                // Dimensiunea imaginii
+                float imgWidth = image.Width;
+                float imgHeight = image.Height;
 
-                using var output = File.Create(pdfPath);
-                document.Save(output);
+                // Calculează raportul de scalare astfel încât imaginea să încapă pe pagină păstrând proporțiile
+                float ratioX = pageSize.Width / imgWidth;
+                float ratioY = pageSize.Height / imgHeight;
+                float ratio = Math.Min(ratioX, ratioY);
+
+                float width = imgWidth * ratio;
+                float height = imgHeight * ratio;
+
+                // Desenează imaginea scalată în colțul din stânga sus al paginii
+                page.Graphics.DrawImage(image, 0, 0, width, height);
+
+                using var outputStream = File.Create(pdfPath);
+                document.Save(outputStream);
 
                 return true;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Eroare generare PDF: {ex}");
+                System.Diagnostics.Debug.WriteLine($"Eroare generare PDF Syncfusion: {ex.Message}");
                 return false;
             }
         }
@@ -178,7 +207,7 @@ namespace EHealthApp
             {
                 var fileName = Path.GetFileName(path);
                 using var stream = File.OpenRead(path);
-                var result = await CommunityToolkit.Maui.Storage.FileSaver.Default.SaveAsync(fileName, stream, default);
+                var result = await CommunityToolkit.Maui.Storage.FileSaver.Default.SaveAsync(fileName, stream);
                 await Toast.Make(result.IsSuccessful ? "PDF salvat!" : "Eroare la salvare!").Show();
             }
             else

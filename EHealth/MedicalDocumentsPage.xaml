@@ -8,7 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Buton pentru adăugare document -->
+            <!-- Buton adaugă document -->
             <Button
                 Text="Adaugă document medical"
                 Clicked="OnAddMedicalDocumentClicked"
@@ -18,14 +18,14 @@
                 HeightRequest="50"
                 HorizontalOptions="Fill" />
 
-            <!-- Titlu Categorii -->
+            <!-- Titlu categorii -->
             <Label
                 Text="Categorii:"
                 FontAttributes="Bold"
                 FontSize="18"
                 TextColor="#2E7D32" />
 
-            <!-- Lista de categorii -->
+            <!-- Lista categorii -->
             <CollectionView
                 x:Name="CategoriesCollectionView"
                 ItemsSource="{Binding Categories}"
@@ -44,22 +44,20 @@
                             BackgroundColor="#81C784"
                             BorderColor="#388E3C">
                             <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroupList>
-                                    <VisualStateGroup Name="CommonStates">
-                                        <VisualState Name="Normal">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="#81C784" />
-                                                <Setter Property="BorderColor" Value="#388E3C" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState Name="Selected">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="#388E3C" />
-                                                <Setter Property="BorderColor" Value="#1B5E20" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateGroupList>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="#81C784" />
+                                            <Setter Property="BorderColor" Value="#388E3C" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="#388E3C" />
+                                            <Setter Property="BorderColor" Value="#1B5E20" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             <Label
                                 Text="{Binding Name}"
@@ -73,14 +71,14 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <!-- Titlu Documente -->
+            <!-- Titlu documente -->
             <Label
                 Text="Documente:"
                 FontAttributes="Bold"
                 FontSize="18"
                 TextColor="#2E7D32" />
 
-            <!-- Lista documentelor -->
+            <!-- Lista documente -->
             <CollectionView
                 x:Name="DocumentsCollectionView"
                 ItemsSource="{Binding FilteredDocuments}">
@@ -93,7 +91,6 @@
                             BorderColor="#C8E6C9"
                             BackgroundColor="#F1F8E9">
                             <VerticalStackLayout Spacing="8">
-
                                 <Label
                                     Text="{Binding FileName}"
                                     FontSize="16"
