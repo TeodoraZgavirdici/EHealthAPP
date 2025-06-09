@@ -7,23 +7,47 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using CommunityToolkit.Maui.Storage;
 using System.Threading.Tasks;
+using CommunityToolkit.Maui.Storage;
 
 namespace EHealthApp
 {
     public partial class MedicalDocumentsPage : ContentPage
     {
-        public ObservableCollection<CategoryGroup> DocumentsGrouped { get; set; } = new();
+        // Categoriile disponibile
+        public ObservableCollection<CategoryDTO> Categories { get; set; } = new()
+        {
+            new CategoryDTO { Name = "Retete" },
+            new CategoryDTO { Name = "ScrisoriMedicale" },
+            new CategoryDTO { Name = "Analize" },
+            new CategoryDTO { Name = "Altele" }
+        };
+
+        // Documentele filtrate pentru categoria selectată
+        public ObservableCollection<DocumentDTO> FilteredDocuments { get; set; } = new();
 
         private List<FileResult> capturedPhotos = new();
+        private CategoryDTO _selectedCategory;
+        public CategoryDTO SelectedCategory
+        {
+            get => _selectedCategory;
+            set
+            {
+                _selectedCategory = value;
+                LoadDocumentsForCategory(_selectedCategory?.Name);
+                OnPropertyChanged(nameof(SelectedCategory));
+            }
+        }
 
         public MedicalDocumentsPage()
         {
             InitializeComponent();
+            BindingContext = this;
             RequestPermissionsAsync();
-            LoadDocuments();
-            DocumentsCollectionView.ItemsSource = DocumentsGrouped;
+
+            // Selectează implicit prima categorie
+            if (Categories.Count > 0)
+                SelectedCategory = Categories[0];
         }
 
         private async void RequestPermissionsAsync()
@@ -39,37 +63,31 @@ namespace EHealthApp
 #endif
         }
 
-        public class CategoryGroup : ObservableCollection<DocumentDTO>
+        public class CategoryDTO
         {
-            public string Category { get; set; }
-            public CategoryGroup(string category, IEnumerable<DocumentDTO> docs) : base(docs) => Category = category;
+            public string Name { get; set; }
         }
+
         public class DocumentDTO
         {
             public string FileName { get; set; }
             public string FilePath { get; set; }
         }
 
-        private void LoadDocuments()
+        private void LoadDocumentsForCategory(string category)
         {
-            DocumentsGrouped.Clear();
-            var root = FileSystem.AppDataDirectory;
-            var categorii = new[] { "Retete", "ScrisoriMedicale", "Analize", "Altele" };
-
-            foreach (var cat in categorii)
+            FilteredDocuments.Clear();
+            if (string.IsNullOrEmpty(category)) return;
+            var folder = Path.Combine(FileSystem.AppDataDirectory, category);
+            if (Directory.Exists(folder))
             {
-                var catDir = Path.Combine(root, cat);
-                if (Directory.Exists(catDir))
+                foreach (var file in Directory.GetFiles(folder, "*.pdf"))
                 {
-                    var files = Directory.GetFiles(catDir, "*.pdf")
-                        .Select(f => new DocumentDTO
-                        {
-                            FileName = Path.GetFileName(f),
-                            FilePath = f
-                        }).ToList();
-
-                    if (files.Count > 0)
-                        DocumentsGrouped.Add(new CategoryGroup(cat, files));
+                    FilteredDocuments.Add(new DocumentDTO
+                    {
+                        FileName = Path.GetFileName(file),
+                        FilePath = file
+                    });
                 }
             }
         }
@@ -99,7 +117,7 @@ namespace EHealthApp
                 adaugaAlta = await DisplayAlert("Pagină nouă?", "Mai adaugi o pagină la acest document?", "DA", "NU");
             } while (adaugaAlta);
 
-            string[] categorii = { "Retete", "ScrisoriMedicale", "Analize", "Altele" };
+            var categorii = Categories.Select(c => c.Name).ToArray();
             string categorie = await DisplayActionSheet("Alege categoria", "Anulează", null, categorii);
 
             if (capturedPhotos.Count > 0 && !string.IsNullOrEmpty(categorie) && categorii.Contains(categorie))
@@ -113,7 +131,9 @@ namespace EHealthApp
                 await GeneratePdfFromImagesAsync(capturedPhotos, pdfPath);
                 await Toast.Make("Document salvat!").Show();
 
-                LoadDocuments(); // Refresh lista
+                // Actualizează lista pentru categoria selectată dacă e aceeași cu cea la care ai adăugat
+                if (SelectedCategory != null && categorie == SelectedCategory.Name)
+                    LoadDocumentsForCategory(SelectedCategory.Name);
             }
             else
             {
@@ -215,5 +235,10 @@ namespace EHealthApp
                 }
             }
         }
+
+        // INotifyPropertyChanged pentru binding
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
     }
 }
