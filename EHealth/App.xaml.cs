@@ -26,7 +26,7 @@ public partial class App : Application
     public App()
     {
         // Înregistrare licență Syncfusion (înlocuiește cu cheia ta reală)
-        SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF1cWWhPYVtpR2Nbek5xdV9HZ1ZUQGYuP1ZhSXxWdkNjWH5fcXNQQmJVU0d9XUs=\r\n");
+        SyncfusionLicenseProvider.RegisterLicense("Mzg5OTcyM0AzMjM5MmUzMDJlMzAzYjMyMzkzYlpmVnoyTXZQOUJtb2hxRWt0S3FOQXFIdGxaMVh2dytSSXFBbkJLbXUvTzQ9\r\n\r\n");
 
         InitializeComponent();
 

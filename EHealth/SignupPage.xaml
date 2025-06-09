@@ -1,24 +1,60 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EHealthApp.SignupPage"
-             Title="Signup">
+             Title="Signup"
+             BackgroundColor="White">
 
     <VerticalStackLayout Padding="16" Spacing="12">
-        <Label Text="Creează cont nou" FontSize="22" HorizontalOptions="Center"/>
+        <Label Text="Creează cont nou" 
+               FontSize="22" 
+               TextColor="#2e7d32"
+               HorizontalOptions="Center"/>
 
-        <!-- Adaugă câmpul pentru Username -->
-        <Entry x:Name="UsernameEntry" Placeholder="Username" Keyboard="Default"/>
+        <!-- Câmp username -->
+        <Entry x:Name="UsernameEntry" 
+               Placeholder="Username" 
+               Keyboard="Default"
+               TextColor="Black"
+               BackgroundColor="#e8f5e9"
+               Margin="0,0,0,8"
+               />
 
-        <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email"/>
-        <Entry x:Name="PasswordEntry" Placeholder="Parolă" IsPassword="True"/>
-        <Entry x:Name="ConfirmPasswordEntry" Placeholder="Confirmă parola" IsPassword="True"/>
+        <Entry x:Name="EmailEntry" 
+               Placeholder="Email" 
+               Keyboard="Email"
+               TextColor="Black"
+               BackgroundColor="#e8f5e9"
+               Margin="0,0,0,8"
+               />
+
+        <Entry x:Name="PasswordEntry" 
+               Placeholder="Parolă" 
+               IsPassword="True"
+               TextColor="Black"
+               BackgroundColor="#e8f5e9"
+               Margin="0,0,0,8"
+               />
+
+        <Entry x:Name="ConfirmPasswordEntry" 
+               Placeholder="Confirmă parola" 
+               IsPassword="True"
+               TextColor="Black"
+               BackgroundColor="#e8f5e9"
+               Margin="0,0,0,16"
+               />
 
         <Button Text="Creează cont"
                 Clicked="OnSignupClicked"
-                HorizontalOptions="FillAndExpand"/>
+                HorizontalOptions="FillAndExpand"
+                BackgroundColor="#4caf50"
+                TextColor="White"
+                CornerRadius="10"/>
 
         <Button Text="Ai deja cont? Autentifică-te"
                 Clicked="OnLoginClicked"
-                HorizontalOptions="FillAndExpand"/>
+                HorizontalOptions="FillAndExpand"
+                BackgroundColor="#2e7d32"
+                TextColor="White"
+                CornerRadius="10"/>
     </VerticalStackLayout>
 </ContentPage>

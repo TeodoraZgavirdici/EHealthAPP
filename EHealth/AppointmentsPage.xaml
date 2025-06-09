@@ -2,36 +2,66 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:syncfusion="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
              x:Class="EHealthApp.AppointmentsPage"
-             Title="Programări">
-	<VerticalStackLayout Padding="16" Spacing="12">
-		<Label Text="Calendar programări" FontSize="22" HorizontalOptions="Center"/>
-		<syncfusion:SfCalendar x:Name="MedicalCalendar"
+             Title="Programări"
+             BackgroundColor="White">
+
+    <VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="Calendar programări"
+               FontSize="22"
+               TextColor="#2e7d32"
+               HorizontalOptions="Center"/>
+
+        <syncfusion:SfCalendar x:Name="MedicalCalendar"
                                View="Month"
                                ShowTodayButton="True"
                                SelectionChanged="MedicalCalendar_SelectionChanged"
                                HeightRequest="350"/>
-		<HorizontalStackLayout Spacing="10">
-			<Button Text="Adaugă programare"
+
+        <HorizontalStackLayout Spacing="10">
+            <Button Text="Adaugă programare"
                     Clicked="OnAddAppointmentClicked"
-                    HorizontalOptions="FillAndExpand"/>
-			<Button Text="Vezi toate programările"
+                    HorizontalOptions="FillAndExpand"
+                    BackgroundColor="#4caf50"
+                    TextColor="White"
+                    CornerRadius="10"/>
+
+            <Button Text="Vezi toate programările"
                     Clicked="OnViewAllAppointmentsClicked"
-                    HorizontalOptions="FillAndExpand"/>
-		</HorizontalStackLayout>
-		<Label Text="Programările zilei selectate:" FontSize="18" Margin="0,12,0,0"/>
-		<CollectionView x:Name="AppointmentsList"
+                    HorizontalOptions="FillAndExpand"
+                    BackgroundColor="#4caf50"
+                    TextColor="White"
+                    CornerRadius="10"/>
+        </HorizontalStackLayout>
+
+        <Label Text="Programările zilei selectate:"
+               FontSize="18"
+               TextColor="#2e7d32"
+               Margin="0,12,0,0"/>
+
+        <CollectionView x:Name="AppointmentsList"
                         HeightRequest="130">
-			<CollectionView.ItemTemplate>
-				<DataTemplate>
-					<Frame Margin="4" Padding="10" BackgroundColor="#f5f5f5" CornerRadius="8">
-						<VerticalStackLayout>
-							<Label Text="{Binding AppointmentDate, StringFormat='{0:HH:mm}'}" FontSize="16" TextColor="#576cbc"/>
-							<Label Text="{Binding Title}" FontSize="15" FontAttributes="Bold"/>
-							<Label Text="{Binding Description}" FontSize="14"/>
-						</VerticalStackLayout>
-					</Frame>
-				</DataTemplate>
-			</CollectionView.ItemTemplate>
-		</CollectionView>
-	</VerticalStackLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="4"
+                           Padding="10"
+                           BackgroundColor="#e8f5e9"
+                           BorderColor="#a5d6a7"
+                           CornerRadius="8">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding AppointmentDate, StringFormat='{0:HH:mm}'}"
+                                   FontSize="16"
+                                   TextColor="#388e3c"/>
+                            <Label Text="{Binding Title}"
+                                   FontSize="15"
+                                   FontAttributes="Bold"
+                                   TextColor="Black"/>
+                            <Label Text="{Binding Description}"
+                                   FontSize="14"
+                                   TextColor="Black"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
 </ContentPage>
