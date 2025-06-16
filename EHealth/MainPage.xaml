@@ -4,32 +4,34 @@
              x:Class="EHealthApp.MainPage"
              BackgroundColor="White">
 
-    <Grid RowDefinitions="*, Auto" Padding="30">
-        <!-- Logo centrat -->
-        <Image Source="appicon.svg"
-               HeightRequest="200"
-               VerticalOptions="Center"
-               HorizontalOptions="Center"
-               Aspect="AspectFit" />
+    <Grid RowDefinitions="Auto, *" Padding="30">
+        <Image Source="main.png"
+            HeightRequest="500"
+             WidthRequest="500"
+             HorizontalOptions="Center"
+             VerticalOptions="Center"
+             Aspect="AspectFit" />
 
-        <!-- Butoane jos -->
         <VerticalStackLayout Grid.Row="1"
                              Spacing="15"
                              VerticalOptions="End"
-                             HorizontalOptions="FillAndExpand">
+                             HorizontalOptions="FillAndExpand"
+                             Margin="0,30,0,0">
+
             <Button Text="Programări medicale"
-                    BackgroundColor="#4CAF50"
+                    BackgroundColor="{StaticResource Primary}"
                     TextColor="White"
                     CornerRadius="10"
                     FontSize="18"
                     Clicked="OnProgramariMedicaleClicked" />
 
             <Button Text="Documente medicale"
-                    BackgroundColor="#4CAF50"
+                    BackgroundColor="{StaticResource Primary}"
                     TextColor="White"
                     CornerRadius="10"
                     FontSize="18"
                     Clicked="OnDocumenteMedicaleClicked" />
+
         </VerticalStackLayout>
     </Grid>
 </ContentPage>
