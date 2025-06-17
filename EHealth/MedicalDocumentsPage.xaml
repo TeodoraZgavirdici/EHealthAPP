@@ -121,6 +121,18 @@
                                         FontSize="14"
                                         BorderColor="#388E3C"
                                         BorderWidth="1" />
+                                    <!-- Buton ștergere -->
+                                    <Button
+                                        Text="Șterge"
+                                        Clicked="OnDeleteClicked"
+                                        CommandParameter="{Binding FilePath}"
+                                        BackgroundColor="#FFCDD2"
+                                        TextColor="#B71C1C"
+                                        CornerRadius="8"
+                                        Padding="14,7"
+                                        FontSize="14"
+                                        BorderColor="#D32F2F"
+                                        BorderWidth="1" />
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Frame>

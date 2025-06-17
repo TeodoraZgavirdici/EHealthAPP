@@ -111,6 +111,14 @@ namespace EHealthApp.Data
                 .ToListAsync();
         }
 
+        // ---------- METODA NOUĂ pentru ștergere după FilePath ----------
+        public Task<MedicalDocument> GetMedicalDocumentByFilePathAsync(string filePath)
+        {
+            return _database.Table<MedicalDocument>()
+                .Where(d => d.FilePath == filePath)
+                .FirstOrDefaultAsync();
+        }
+
         public Task<int> SaveMedicalDocumentAsync(MedicalDocument document) => SaveAsync(document);
 
         public Task<int> DeleteMedicalDocumentAsync(MedicalDocument document) => DeleteAsync(document);

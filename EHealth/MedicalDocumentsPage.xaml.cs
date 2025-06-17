@@ -69,7 +69,6 @@ namespace EHealthApp
             public string FilePath { get; set; }
         }
 
-        // ====== 1. Capture multiple photos using the camera ======
         private async Task<List<FileResult>> CaptureMultiplePhotosAsync()
         {
             var photos = new List<FileResult>();
@@ -85,7 +84,6 @@ namespace EHealthApp
             return photos;
         }
 
-        // ====== 2. Save captured photos to a local temporary folder ======
         private async Task<List<string>> CopyPhotoFilesLocallyAsync(List<FileResult> photos)
         {
             List<string> localPaths = new();
@@ -100,12 +98,12 @@ namespace EHealthApp
             return localPaths;
         }
 
-        // ====== 3. Generate PDF from all images ======
         private async Task<bool> GeneratePdfFromImageListAsync(List<string> imagePaths, string pdfPath)
         {
             try
             {
                 using var document = new PdfDocument();
+
                 foreach (var imagePath in imagePaths)
                 {
                     if (!File.Exists(imagePath))
@@ -116,13 +114,17 @@ namespace EHealthApp
                     var page = document.Pages.Add();
                     var pageSize = page.GetClientSize();
 
-                    // Scaling image to fit the page
-                    float ratioX = pageSize.Width / image.Width;
-                    float ratioY = pageSize.Height / image.Height;
-                    float ratio = Math.Min(ratioX, ratioY);
-                    float width = image.Width * ratio;
-                    float height = image.Height * ratio;
-                    page.Graphics.DrawImage(image, 0, 0, width, height);
+                    const float margin = 40;
+                    float areaWidth = pageSize.Width - 2 * margin;
+                    float areaHeight = pageSize.Height - 2 * margin;
+                    float scale = Math.Min(areaWidth / image.Width, areaHeight / image.Height);
+                    float drawWidth = image.Width * scale;
+                    float drawHeight = image.Height * scale;
+                    float drawX = (pageSize.Width - drawWidth) / 2;
+                    float drawY = (pageSize.Height - drawHeight) / 2;
+
+                    page.Graphics.DrawRectangle(PdfBrushes.White, new Syncfusion.Drawing.RectangleF(0, 0, pageSize.Width, pageSize.Height));
+                    page.Graphics.DrawImage(image, drawX, drawY, drawWidth, drawHeight);
                 }
 
                 using var outputStream = File.Create(pdfPath);
@@ -136,7 +138,6 @@ namespace EHealthApp
             }
         }
 
-        // ====== 4. Full workflow: Take photos, generate PDF, save record ======
         private async void OnAddPhotoPdfDocumentClicked(object sender, EventArgs e)
         {
             try
@@ -188,7 +189,6 @@ namespace EHealthApp
             }
         }
 
-        // ====== 5. Load existing documents for the selected category ======
         private async Task LoadDocumentsForCategoryAsync(string category)
         {
             FilteredDocuments.Clear();
@@ -206,7 +206,6 @@ namespace EHealthApp
             }
         }
 
-        // ====== 6. Share a PDF ======
         private async void OnShareClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string path && File.Exists(path))
@@ -223,7 +222,6 @@ namespace EHealthApp
             }
         }
 
-        // ====== 7. Download (Save as...) PDF ======
         private async void OnDownloadClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is string path && File.Exists(path))
@@ -239,7 +237,38 @@ namespace EHealthApp
             }
         }
 
-        // ====== PropertyChanged handler ======
+        private async void OnDeleteClicked(object sender, EventArgs e)
+        {
+            if (sender is Button btn && btn.CommandParameter is string filePath)
+            {
+                bool confirm = await DisplayAlert("Confirmare", "Ești sigur că vrei să ștergi acest document?", "Da", "Nu");
+                if (!confirm)
+                    return;
+
+                try
+                {
+                    if (File.Exists(filePath))
+                        File.Delete(filePath);
+
+                    var doc = await _database.GetMedicalDocumentByFilePathAsync(filePath);
+                    if (doc != null)
+                        await _database.DeleteMedicalDocumentAsync(doc);
+
+                    await LoadDocumentsForCategoryAsync(SelectedCategory?.Name);
+
+                    await Toast.Make("Document șters cu succes!").Show();
+                }
+                catch (Exception ex)
+                {
+                    await Toast.Make($"Eroare la ștergere: {ex.Message}").Show();
+                }
+            }
+            else
+            {
+                await Toast.Make("Fișier lipsă sau invalid!").Show();
+            }
+        }
+
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));

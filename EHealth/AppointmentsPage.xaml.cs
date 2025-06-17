@@ -2,6 +2,9 @@
 using EHealthApp.Models;
 using Syncfusion.Maui.Calendar;
 using System.Collections.ObjectModel;
+using Plugin.LocalNotification;
+
+
 
 namespace EHealthApp;
 
@@ -13,7 +16,7 @@ public partial class AppointmentsPage : ContentPage
     public AppointmentsPage()
     {
         InitializeComponent();
-        _database = App.Database; // asigură-te că ai o proprietate statică App.Database
+        _database = App.Database;
         AppointmentsList.ItemsSource = _programariAfisate;
         LoadAppointments(DateTime.Today);
     }
@@ -52,16 +55,59 @@ public partial class AppointmentsPage : ContentPage
                 return;
             }
 
+            var dataOraProgramare = ziSelectata.Date + timespan;
+
             var appointment = new Appointment
             {
-                AppointmentDate = ziSelectata.Date + timespan,
+                AppointmentDate = dataOraProgramare,
                 Title = titlu,
                 Description = descriere
             };
 
             await _database.SaveAppointmentAsync(appointment);
+
+            // NOTIFICARE cu 24 de ore înainte (doar dacă timpul este valid față de prezent) 
+            var notify24h = dataOraProgramare.AddHours(-24);
+            if (notify24h > DateTime.Now)
+            {
+                var notification24h = new NotificationRequest
+                {
+                    NotificationId = ((int)DateTime.Now.Ticks & 0xFFFFFFF),
+                    Title = $"Reminder programare: {titlu}",
+                    Description = $"Mâine la {dataOraProgramare:HH:mm}: {descriere}",
+                    Schedule = new NotificationRequestSchedule
+                    {
+                        NotifyTime = notify24h,
+                        NotifyRepeatInterval = TimeSpan.Zero,
+                    }
+                };
+                NotificationCenter.Current.Show(notification24h);
+            }
+
+            // NOTIFICARE cu 30 de minute înainte (doar dacă timpul este valid față de prezent)
+            var notify30min = dataOraProgramare.AddMinutes(-30);
+            if (notify30min > DateTime.Now)
+            {
+                var notification30min = new NotificationRequest
+                {
+                    NotificationId = (((int)DateTime.Now.Ticks & 0xFFFFFFF) + 1),
+                    Title = $"Reminder programare: {titlu}",
+                    Description = $"Ai programare în 30 de minute: {descriere}",
+                    Schedule = new NotificationRequestSchedule
+                    {
+                        NotifyTime = notify30min,
+                        NotifyRepeatInterval = TimeSpan.Zero,
+                    }
+                };
+                NotificationCenter.Current.Show(notification30min);
+            }
+
             LoadAppointments(ziSelectata);
-            await DisplayAlert("Succes", "Programare adăugată!", "OK");
+            await DisplayAlert(
+                "Succes",
+                "Programare adăugată! Vei primi două notificări: una cu 24h înainte, alta cu 30 de minute înainte, dacă mai este timp până la acestea.",
+                "OK"
+            );
         }
     }
 
