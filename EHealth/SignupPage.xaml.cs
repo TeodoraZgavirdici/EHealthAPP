@@ -19,8 +19,8 @@ namespace EHealthApp
         {
             string username = UsernameEntry.Text?.Trim();
             string email = EmailEntry.Text?.Trim();
-            string password = PasswordEntry.Text;
-            string confirmPassword = ConfirmPasswordEntry.Text;
+            string password = PasswordEntry.Text?.Trim();         // <-- adaugă .Trim()
+            string confirmPassword = ConfirmPasswordEntry.Text?.Trim(); // <-- adaugă .Trim()
 
             if (string.IsNullOrEmpty(username) ||
                 string.IsNullOrEmpty(email) ||
