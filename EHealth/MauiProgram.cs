@@ -5,7 +5,6 @@ using CommunityToolkit.Maui;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Storage;
-using Plugin.LocalNotification;
 using System.IO;
 
 namespace EHealthApp;
