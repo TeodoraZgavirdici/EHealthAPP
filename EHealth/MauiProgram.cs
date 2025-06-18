@@ -17,10 +17,9 @@ public static class MauiProgram
 
         var builder = MauiApp.CreateBuilder();
 
-        builder
+        _ = builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
-            .UseLocalNotification()         // ← este deja aici, corect!
             .ConfigureSyncfusionCore()
             .ConfigureFonts(fonts =>
             {

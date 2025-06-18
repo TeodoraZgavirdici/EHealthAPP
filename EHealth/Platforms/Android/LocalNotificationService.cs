@@ -1,61 +1,38 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
-using EHealthApp.Services;
-using EHealthApp.Platforms.Android;
-using System;
+using EHealthApp;
+using EHealth;
 
-[assembly: Microsoft.Maui.Controls.Dependency(typeof(LocalNotificationService))]
-namespace EHealthApp.Services
+using EHealth.Services;
+using Java.Lang;            // adaugă asta pentru Class
+using Microsoft.Maui.Controls;
+
+[assembly: Dependency(typeof(EHealthApp.Platforms.Android.LocalNotificationService))]
+namespace EHealthApp.Platforms.Android
 {
     public class LocalNotificationService : ILocalNotificationService
     {
-        const string ChannelId = "default_channel";
-
         public void ScheduleNotification(DateTime notifyTime, string title, string message)
         {
             var context = Android.App.Application.Context;
+            var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
 
-            CreateNotificationChannel();
-
-            Intent intent = new Intent(context, typeof(NotificationReceiver));
+            // Folosește Class.FromType pentru a converti System.Type în Java.Lang.Class
+            var intent = new Intent(context, Class.FromType(typeof(NotificationReceiver)));
             intent.PutExtra("title", title);
             intent.PutExtra("message", message);
 
-            int requestCode = (int)(notifyTime.Ticks & 0xFFFFFFF); // id unic bazat pe data
+            int requestCode = (int)(notifyTime.Ticks & 0xFFFFFFF);
 
-            PendingIntent pendingIntent = PendingIntent.GetBroadcast(context, requestCode, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
-
-            var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
+            var pendingIntent = PendingIntent.GetBroadcast(context, requestCode, intent, PendingIntentFlags.Immutable);
 
             long triggerAtMillis = (long)(notifyTime.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
-            {
                 alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
-            }
-            else if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-            {
-                alarmManager.SetExact(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
-            }
             else
-            {
-                alarmManager.Set(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
-            }
-        }
-
-        void CreateNotificationChannel()
-        {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                var context = Android.App.Application.Context;
-                var channel = new NotificationChannel(ChannelId, "Default Channel", NotificationImportance.Default)
-                {
-                    Description = "Default notification channel"
-                };
-                var notificationManager = (NotificationManager)context.GetSystemService(Context.NotificationService);
-                notificationManager.CreateNotificationChannel(channel);
-            }
+                alarmManager.SetExact(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
         }
     }
 }

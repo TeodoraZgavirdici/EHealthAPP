@@ -2,6 +2,7 @@
 using Microsoft.Maui.Storage;
 using Syncfusion.Licensing;
 
+
 namespace EHealthApp;
 
 public partial class App : Application

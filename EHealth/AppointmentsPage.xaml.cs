@@ -67,7 +67,6 @@ public partial class AppointmentsPage
 
             await _database.SaveAppointmentAsync(appointment);
 
-            // Obține serviciul de notificări
             var notificationService = DependencyService.Get<ILocalNotificationService>();
 
             // NOTIFICARE cu 24 de ore înainte

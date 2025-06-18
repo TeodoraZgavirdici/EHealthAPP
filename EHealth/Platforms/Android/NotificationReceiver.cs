@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android;
 using Android.Content;
 using AndroidX.Core.App;
 
@@ -15,7 +16,7 @@ namespace EHealthApp.Platforms.Android
             var builder = new NotificationCompat.Builder(context, "default_channel")
                 .SetContentTitle(title)
                 .SetContentText(message)
-                .SetSmallIcon(Android.Resource.Drawable.appicon)
+                .SetSmallIcon(global::Android.Resource.Drawable.SymDefAppIcon)
                 .SetAutoCancel(true);
 
             var notificationManager = NotificationManagerCompat.From(context);
