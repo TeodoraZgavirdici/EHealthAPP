@@ -1,7 +1,6 @@
 ﻿using EHealth.Services;
 using EHealthApp.Data;
 using EHealthApp.Models;
-using EHealthApp.Services; // serviciul propriu pentru notificări
 using Microsoft.Maui.Controls;
 using Syncfusion.Maui.Calendar;
 using System;
@@ -10,7 +9,7 @@ using System.Linq;
 
 namespace EHealthApp;
 
-public partial class AppointmentsPage : ContentPage
+public partial class AppointmentsPage
 {
     private readonly AppDatabase _database;
     private readonly ObservableCollection<Appointment> _programariAfisate = new();
