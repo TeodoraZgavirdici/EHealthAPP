@@ -31,6 +31,14 @@
                     CornerRadius="10"
                     FontSize="18"
                     Clicked="OnDocumenteMedicaleClicked" />
+            
+            <Button Text="Logout"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    FontSize="18"
+                    Clicked="OnLogoutButtonClicked" />
+
 
         </VerticalStackLayout>
     </Grid>

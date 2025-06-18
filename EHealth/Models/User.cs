@@ -13,12 +13,12 @@ namespace EHealthApp.Data
         [MaxLength(100), NotNull]
         public string Password { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(100), NotNull]
+        public string Email { get; set; }
+
+        [MaxLength(200)]
         public string FullName { get; set; }
 
         public DateTime DateOfBirth { get; set; }
-        public string Email { get; set; } // <--- ADĂUGĂ ACEASTĂ LINIE
-        public string Name { get; set; }
-
     }
 }

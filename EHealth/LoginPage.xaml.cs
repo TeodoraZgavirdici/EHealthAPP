@@ -1,55 +1,46 @@
-﻿using EHealthApp.Data;
-using Microsoft.Maui.Storage; // Adaugă acest using pentru Preferences
+﻿using EHealth.Services;
+using Microsoft.Maui.Storage;
 
-namespace EHealthApp
+namespace EHealthApp;
+
+public partial class LoginPage : ContentPage
 {
-    public partial class LoginPage : ContentPage
+    public LoginPage()
     {
-        private readonly AppDatabase _database;
+        InitializeComponent();
+    }
 
-        // Constructor fără parametri pentru Shell
-        public LoginPage() : this(App.Database) { }
+    private async void OnLoginButtonClicked(object sender, EventArgs e)
+    {
+        string email = UsernameEntry.Text?.Trim();
+        string password = PasswordEntry.Text;
 
-        public LoginPage(AppDatabase database)
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
-            InitializeComponent();
-            _database = database;
+            await DisplayAlert("Eroare", "Completează toate câmpurile!", "OK");
+            return;
         }
 
-        private async void OnLoginButtonClicked(object sender, EventArgs e)
+        var user = await App.Database.GetUserByEmailAndPassword(email, password);
+
+        if (user != null)
         {
-            string username = UsernameEntry.Text;
-            string password = PasswordEntry.Text;
+            Preferences.Set("logged_user", email);
 
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-            {
-                ShowErrorMessage("Username and password are required.");
-                return;
-            }
+            var notificationService = DependencyService.Get<ILocalNotificationService>();
+            string displayName = !string.IsNullOrEmpty(user.FullName) ? user.FullName : user.Username;
+            notificationService?.ScheduleNotification(DateTime.Now, "Autentificare reușită", $"Bine ai venit, {displayName}!");
 
-            var user = await _database.GetUserByUsernameAsync(username);
-            if (user == null || user.Password != password)
-            {
-                ShowErrorMessage("Invalid username or password.");
-                return;
-            }
-
-            // Salvează userul logat în Preferences (persistent login)
-            Preferences.Set("logged_user", user.Username);
-
-            // Navighează la Home (MainPage) și resetează stiva de navigare
-            await Shell.Current.GoToAsync("//MainPage");
+            Application.Current.MainPage = new NavigationPage(new MainPage());
         }
-
-        private async void OnSignupButtonClicked(object sender, EventArgs e)
+        else
         {
-            await Shell.Current.GoToAsync("signup");
+            await DisplayAlert("Eroare", "Email sau parola incorecte!", "OK");
         }
+    }
 
-        private void ShowErrorMessage(string message)
-        {
-            ErrorMessageLabel.Text = message;
-            ErrorMessageLabel.IsVisible = true;
-        }
+    private async void OnSignupButtonClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new SignupPage());
     }
 }

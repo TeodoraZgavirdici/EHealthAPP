@@ -21,12 +21,24 @@ namespace EHealthApp
 
         private async void OnProgramariMedicaleClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new AppointmentsPage()); // ✅
+            await Navigation.PushAsync(new AppointmentsPage());
         }
 
         private async void OnDocumenteMedicaleClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new MedicalDocumentsPage(_database));
+        }
+
+        private void Logout()
+        {
+            Preferences.Remove("logged_user");
+
+            Application.Current.MainPage = new NavigationPage(new LoginPage());
+        }
+
+        private void OnLogoutButtonClicked(object sender, EventArgs e)
+        {
+            Logout();
         }
     }
 }

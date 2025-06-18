@@ -7,10 +7,8 @@ namespace EHealthApp
     {
         private readonly AppDatabase _database;
 
-        // Constructor fără parametri pentru Shell și DI
         public SignupPage() : this(App.Database) { }
 
-        // Constructor cu bază de date pentru testare sau injecție explicită
         public SignupPage(AppDatabase database)
         {
             InitializeComponent();
@@ -19,12 +17,11 @@ namespace EHealthApp
 
         private async void OnSignupClicked(object sender, EventArgs e)
         {
-            string username = UsernameEntry.Text?.Trim(); // <-- adăugat
+            string username = UsernameEntry.Text?.Trim();
             string email = EmailEntry.Text?.Trim();
             string password = PasswordEntry.Text;
             string confirmPassword = ConfirmPasswordEntry.Text;
 
-            // Verificăm să fie completate toate câmpurile
             if (string.IsNullOrEmpty(username) ||
                 string.IsNullOrEmpty(email) ||
                 string.IsNullOrEmpty(password) ||
@@ -47,7 +44,6 @@ namespace EHealthApp
                 return;
             }
 
-            // Verifică unicitatea username-ului (opțional, dar recomandat)
             var existingUser = await _database.GetUserByUsernameAsync(username);
             if (existingUser != null)
             {
@@ -57,7 +53,7 @@ namespace EHealthApp
 
             var user = new User
             {
-                Username = username, // <-- adăugat
+                Username = username,
                 Email = email,
                 Password = password
             };
@@ -65,13 +61,13 @@ namespace EHealthApp
             await _database.SaveUserAsync(user);
 
             await DisplayAlert("Succes", "Cont creat cu succes!", "OK");
-            await Shell.Current.GoToAsync("..");
+
+            await Navigation.PopAsync();
         }
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
-            // Navighează către pagina de login (presupunând că ai o rută definită în Shell)
-            await Shell.Current.GoToAsync("..");
+            await Navigation.PopAsync();
         }
     }
 }

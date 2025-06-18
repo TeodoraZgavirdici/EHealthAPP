@@ -33,6 +33,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="AppShell.xaml.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Remove="AppShell.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.20" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
@@ -45,7 +53,6 @@
 
 	<ItemGroup>
 		<Page Include="App.xaml" />
-		<Page Include="AppShell.xaml" />
 		<Page Include="LoginPage.xaml" />
 		<Page Include="MainPage.xaml" />
 		<Page Include="SignupPage.xaml" />
