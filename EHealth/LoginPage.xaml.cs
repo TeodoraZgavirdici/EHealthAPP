@@ -1,4 +1,4 @@
-﻿using EHealth.Services;
+﻿using EHealthApp.Data;
 using Microsoft.Maui.Storage;
 
 namespace EHealthApp;
@@ -12,10 +12,10 @@ public partial class LoginPage : ContentPage
 
     private async void OnLoginButtonClicked(object sender, EventArgs e)
     {
-        string email = UsernameEntry.Text?.Trim();
-        string password = PasswordEntry.Text;
+        string email = EmailEntry?.Text?.Trim();
+        string password = PasswordEntry?.Text;
 
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
             await DisplayAlert("Eroare", "Completează toate câmpurile!", "OK");
             return;
@@ -25,17 +25,15 @@ public partial class LoginPage : ContentPage
 
         if (user != null)
         {
-            Preferences.Set("logged_user", email);
+            Preferences.Set("logged_user", email); 
 
-            var notificationService = DependencyService.Get<ILocalNotificationService>();
-            string displayName = !string.IsNullOrEmpty(user.FullName) ? user.FullName : user.Username;
-            notificationService?.ScheduleNotification(DateTime.Now, "Autentificare reușită", $"Bine ai venit, {displayName}!");
+            await DisplayAlert("Succes", $"Bun venit, {user.FullName ?? user.Email}!", "OK");
 
             Application.Current.MainPage = new NavigationPage(new MainPage());
         }
         else
         {
-            await DisplayAlert("Eroare", "Email sau parola incorecte!", "OK");
+            await DisplayAlert("Eroare", "Email sau parolă incorectă!", "OK");
         }
     }
 

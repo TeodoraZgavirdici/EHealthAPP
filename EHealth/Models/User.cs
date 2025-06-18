@@ -2,23 +2,22 @@
 
 namespace EHealthApp.Data
 {
-    public class User : IRecord
+  public class User : IRecord
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        [MaxLength(100), Unique, NotNull]
-        public string Username { get; set; }
-
-        [MaxLength(100), NotNull]
-        public string Password { get; set; }
-
-        [MaxLength(100), NotNull]
+        [NotNull]
         public string Email { get; set; }
 
-        [MaxLength(200)]
-        public string FullName { get; set; }
+        [NotNull]
+        public string Username { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+
+        [NotNull]
+        public string Password { get; set; }
+
+        public string FullName { get; set; }  // opțional, dar clar tip string
     }
+
 }
