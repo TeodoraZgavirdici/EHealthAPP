@@ -114,14 +114,10 @@ namespace EHealthApp
                     var page = document.Pages.Add();
                     var pageSize = page.GetClientSize();
 
-                    const float margin = 40;
-                    float areaWidth = pageSize.Width - 2 * margin;
-                    float areaHeight = pageSize.Height - 2 * margin;
-                    float scale = Math.Min(areaWidth / image.Width, areaHeight / image.Height);
-                    float drawWidth = image.Width * scale;
-                    float drawHeight = image.Height * scale;
-                    float drawX = (pageSize.Width - drawWidth) / 2;
-                    float drawY = (pageSize.Height - drawHeight) / 2;
+                    float drawX = 0f;
+                    float drawY = 0f;
+                    float drawWidth = pageSize.Width;
+                    float drawHeight = pageSize.Height;
 
                     page.Graphics.DrawRectangle(PdfBrushes.White, new Syncfusion.Drawing.RectangleF(0, 0, pageSize.Width, pageSize.Height));
                     page.Graphics.DrawImage(image, drawX, drawY, drawWidth, drawHeight);
@@ -137,6 +133,7 @@ namespace EHealthApp
                 return false;
             }
         }
+
 
         private async void OnAddPhotoPdfDocumentClicked(object sender, EventArgs e)
         {

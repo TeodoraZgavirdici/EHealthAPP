@@ -10,7 +10,6 @@
                TextColor="#2e7d32"
                HorizontalOptions="Center"/>
 
-        <!-- Câmp username -->
         <Entry x:Name="UsernameEntry" 
                Placeholder="Username" 
                Keyboard="Default"

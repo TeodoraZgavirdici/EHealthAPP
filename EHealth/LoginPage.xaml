@@ -11,41 +11,40 @@
         <VerticalStackLayout Padding="30" Spacing="15" BackgroundColor="White">
 
             <Label Text="Welcome to EHealthApp"
-         FontSize="24"
-         TextColor="#2e7d32"
-         HorizontalTextAlignment="Center"
-         Margin="0,20,0,0" />
+                   FontSize="24"
+                   TextColor="#2e7d32"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,20,0,0" />
 
             <Entry x:Name="EmailEntry"
-         Placeholder="Introduceți emailul"
-         Keyboard="Email"
-         TextColor="Black"
-         BackgroundColor="#a5d6a7" 
-                PlaceholderColor="#2e7d32"
-                Margin="0,0,0,8" />
+                   Placeholder="Introduceți emailul"
+                   Keyboard="Email"
+                   TextColor="Black"
+                   BackgroundColor="White"
+                   PlaceholderColor="#2e7d32"
+                   Margin="0,0,0,8" />
 
-                <Entry x:Name="PasswordEntry"
-         Placeholder="Parolă"
-         IsPassword="True"
-         TextColor="Black"
-         BackgroundColor="#a5d6a7"
-         PlaceholderColor="#2e7d32"
-         Margin="0,0,0,16" />
+            <Entry x:Name="PasswordEntry"
+                   Placeholder="Parolă"
+                   IsPassword="True"
+                   TextColor="Black"
+                   BackgroundColor="White"
+                   PlaceholderColor="#2e7d32"
+                   Margin="0,0,0,16" />
 
-                <Button Text="Login"
-          Clicked="OnLoginButtonClicked"
-          BackgroundColor="#2e7d32" 
-          CornerRadius="10"
-          HorizontalOptions="FillAndExpand"/>
+            <Button Text="Login"
+                    Clicked="OnLoginButtonClicked"
+                    BackgroundColor="#2e7d32"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand"/>
 
-                    <Button Text="Nu ai cont? Creează cont nou"
-          Clicked="OnSignupButtonClicked"
-          BackgroundColor="Transparent"
-          TextColor="#2e7d32"
-          HorizontalOptions="FillAndExpand"/>
+            <Button Text="Nu ai cont? Creează cont nou"
+                    Clicked="OnSignupButtonClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="#2e7d32"
+                    HorizontalOptions="FillAndExpand"/>
 
         </VerticalStackLayout>
-
 
         <!-- Mesaj de eroare -->
         <Label x:Name="ErrorMessageLabel"

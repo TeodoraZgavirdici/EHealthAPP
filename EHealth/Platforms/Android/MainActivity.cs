@@ -1,7 +1,6 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using AndroidX.Core.App;
 
 namespace EHealth
 {
@@ -12,33 +11,37 @@ namespace EHealth
     {
         const int RequestNotificationId = 1000;
         const string ChannelId = "default_channel";
-        const string ChannelName = "Default Channel";
+        const string ChannelName = "Notificări EHealth";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
             CreateNotificationChannel();
-
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu) 
-            {
-                if (CheckSelfPermission(Android.Manifest.Permission.PostNotifications) != Android.Content.PM.Permission.Granted)
-                {
-                    RequestPermissions(new[] { Android.Manifest.Permission.PostNotifications }, RequestNotificationId);
-                }
-            }
+            RequestNotificationPermissionIfNeeded();
         }
 
         void CreateNotificationChannel()
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O) 
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
                 var channel = new NotificationChannel(ChannelId, ChannelName, NotificationImportance.Default)
                 {
-                    Description = "Channel for local notifications"
+                    Description = "Canal pentru notificări locale EHealth"
                 };
                 var notificationManager = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager.CreateNotificationChannel(channel);
+            }
+        }
+
+        void RequestNotificationPermissionIfNeeded()
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
+            {
+                if (CheckSelfPermission(Android.Manifest.Permission.PostNotifications) != Permission.Granted)
+                {
+                    RequestPermissions(new[] { Android.Manifest.Permission.PostNotifications }, RequestNotificationId);
+                }
             }
         }
     }

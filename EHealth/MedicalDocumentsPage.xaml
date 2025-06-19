@@ -15,7 +15,6 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <!-- Adaugă document medical DIN POZE -->
             <Button
                 Text="Adaugă document medical"
                 Clicked="OnAddPhotoPdfDocumentClicked"
@@ -27,14 +26,12 @@
                 HeightRequest="52"
                 HorizontalOptions="Fill" />
 
-            <!-- Titlu categorii -->
             <Label
                 Text="Categorii:"
                 FontSize="17"
                 FontAttributes="Bold"
                 TextColor="#388E3C" />
 
-            <!-- CATEGORII -->
             <CollectionView
                 x:Name="CategoriesCollectionView"
                 ItemsSource="{Binding Categories}"
@@ -72,7 +69,6 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <!-- Titlu documente -->
             <Label
                 Text="Documente:"
                 FontSize="17"
@@ -80,7 +76,6 @@
                 TextColor="#388E3C"
                 Margin="0,10,0,0" />
 
-            <!-- LISTA DOCUMENTE -->
             <CollectionView
                 x:Name="DocumentsCollectionView"
                 ItemsSource="{Binding FilteredDocuments}">
@@ -121,7 +116,6 @@
                                         FontSize="14"
                                         BorderColor="#388E3C"
                                         BorderWidth="1" />
-                                    <!-- Buton ștergere -->
                                     <Button
                                         Text="Șterge"
                                         Clicked="OnDeleteClicked"

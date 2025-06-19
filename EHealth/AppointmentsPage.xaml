@@ -39,7 +39,7 @@
                Margin="0,12,0,0"/>
 
         <CollectionView x:Name="AppointmentsList"
-                        HeightRequest="130">
+                        HeightRequest="160">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Margin="4"
@@ -58,6 +58,13 @@
                             <Label Text="{Binding Description}"
                                    FontSize="14"
                                    TextColor="Black"/>
+                            <Button Text="Șterge"
+                                    BackgroundColor="#e53935"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    Margin="0,8,0,0"
+                                    Clicked="OnDeleteAppointmentClicked"
+                                    CommandParameter="{Binding .}" />
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>

@@ -1,5 +1,4 @@
 ﻿using Android.App;
-using Android;
 using Android.Content;
 using AndroidX.Core.App;
 
@@ -12,6 +11,7 @@ namespace EHealthApp.Platforms.Android
         {
             string title = intent.GetStringExtra("title");
             string message = intent.GetStringExtra("message");
+            System.Diagnostics.Debug.WriteLine($"NOTIFICARE PRIMITĂ: {title} - {message}");
 
             var builder = new NotificationCompat.Builder(context, "default_channel")
                 .SetContentTitle(title)
